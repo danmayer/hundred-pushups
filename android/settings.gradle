@@ -1,0 +1,3 @@
+rootProject.name = 'HundredPushups'
+
+include ':app'

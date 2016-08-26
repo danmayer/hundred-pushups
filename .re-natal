@@ -1,0 +1,14 @@
+{
+  "name": "HundredPushups",
+  "interface": "rum",
+  "androidHost": "localhost",
+  "iosHost": "localhost",
+  "envRoots": {
+    "dev": "env/dev",
+    "prod": "env/prod"
+  },
+  "modules": [],
+  "imageDirs": [
+    "images"
+  ]
+}
