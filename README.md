@@ -4,6 +4,15 @@ A mobile app based on the plan at http://www.100pushups.com/
 
 ## Usage
 
+Install deps:
+
+`brew install node
+ brew install watchman`
+
+Install React Native CLI tool:
+
+`npm install -g react-native-cli`
+
 Install `re-natal`:
 
 `npm install -g re-natal`
@@ -16,11 +25,13 @@ To get started with your new app, first cd into its directory:
 `cd hundred-pushups`
 
 Open iOS app in xcode and run it:
-`re-natal xcode`
+
+`react-native run-ios`
 
 To use figwheel type:
+
 `re-natal use-figwheel
-lein figwheel ios`
+ lein figwheel ios`
 
 Reload the app in simulator
 
