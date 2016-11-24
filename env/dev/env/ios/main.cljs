@@ -1,15 +1,17 @@
-(ns ^:figwheel-no-load env.ios.main
-  (:require [hundred-pushups.ios.core :as core]
+ (ns ^:figwheel-no-load env.ios.main
+  (:require [reagent.core :as r]
+            [hundred-pushups.ios.core :as core]
             [figwheel.client :as figwheel :include-macros true]))
 
-(enable-console-print!)
+ (enable-console-print!)
+
+(def cnt (r/atom 0))
+(defn reloader [] @cnt [core/app-root])
+(def root-el (r/as-element [reloader]))
 
 (figwheel/watch-and-reload
-  :websocket-url "ws://localhost:3449/figwheel-ws"
-  :heads-up-display false
-  ;; TODO make this Rum something
-  :jsload-callback #(#'core/mount-app))
+ :websocket-url "ws://localhost:3449/figwheel-ws"
+ :heads-up-display false
+ :jsload-callback #(swap! cnt inc))
 
 (core/init)
-
-(def root-el (core/root-component-factory))

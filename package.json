@@ -3,10 +3,22 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node_modules/react-native/packager/packager.sh --nonPersistent"
+    "start": "node_modules/react-native/packager/packager.sh --nonPersistent",
+    "test": "jest"
   },
-    "dependencies": {
-      "react": "15.3.1",
-      "react-native": "^0.37.0"
+  "dependencies": {
+    "babel-plugin-transform-es2015-block-scoping": "6.15.0",
+    "react": "15.3.2",
+    "react-native": "0.37.0"
+  },
+  "jest": {
+    "preset": "jest-react-native"
+  },
+  "devDependencies": {
+    "babel-jest": "17.0.2",
+    "babel-preset-react-native": "1.9.0",
+    "jest": "17.0.3",
+    "jest-react-native": "17.0.3",
+    "react-test-renderer": "15.3.2"
   }
 }
