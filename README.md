@@ -6,8 +6,10 @@ A mobile app based on the plan at http://www.100pushups.com/
 
 Install deps:
 
-`brew install node
- brew install watchman`
+```bash
+ brew install node
+ brew install watchman
+```
 
 Install React Native CLI tool:
 
@@ -30,8 +32,11 @@ Open iOS app in xcode and run it:
 
 To use figwheel type:
 
-`re-natal use-figwheel
- lein figwheel ios`
+```bash
+re-natal deps
+re-natal use-figwheel
+lein figwheel ios
+```
 
 Reload the app in simulator
 
