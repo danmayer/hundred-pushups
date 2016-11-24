@@ -1,7 +1,8 @@
 (ns hundred-pushups.ios.core
   (:require-macros [rum.core :refer [defc]])
   (:require [re-natal.support :as support]
-            [rum.core :as rum]))
+            [rum.core :as rum]
+            [hundred-pushups.core :as core]))
 
 (set! js/window.React (js/require "react"))
 (def ReactNative (js/require "react-native"))

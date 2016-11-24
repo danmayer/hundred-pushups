@@ -1,8 +1,12 @@
 # hundred-pushups
 
-A Clojure library designed to ... well, that part is up to you.
+A mobile app based on the plan at http://www.100pushups.com/
 
 ## Usage
+
+Install `re-natal`:
+
+`npm install -g re-natal`
 
 To open emacs with access to inf-clojure and a REPL, do
 
@@ -27,6 +31,10 @@ Changes you make via the REPL or by changing your .cljs files should appear live
 
 Try this command as an example:
 `(swap! app-state assoc :greeting "Hello Clojure in iOS and Android with Rum!")`
+
+### Tests
+
+`lein with-profile +tools test-refresh :changes-only`
 
 ## License
 
