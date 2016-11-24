@@ -41,7 +41,7 @@ At the REPL prompt type this:
 Changes you make via the REPL or by changing your .cljs files should appear live.
 
 Try this command as an example:
-`(swap! app-state assoc :greeting "Hello Clojure in iOS and Android with Rum!")`
+` (dispatch [:set-greeting "Hi everyone"])`
 
 ### Tests
 
