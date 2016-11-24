@@ -48,13 +48,33 @@ Changes you make via the REPL or by changing your .cljs files should appear live
 Try this command as an example:
 ` (dispatch [:set-greeting "Hi everyone"])`
 
+#### Starting Figwheel REPL from nREPL
+
+Starting Figwheel REPL from nREPL
+
+To start Figwheel within nREPL session:
+
+`$ lein repl`
+
+Then in the nREPL prompt type:
+
+`user=> (start-figwheel "ios")`
+
+Or, for Android build type:
+
+`user=> (start-figwheel "android")`
+
+Or, for both type:
+
+`user=> (start-figwheel "ios" "android")`
+
 ### Tests
 
 `lein with-profile +tools test-refresh :changes-only`
 
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2016 Ben Brinckerhoff and Dan Mayer
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
