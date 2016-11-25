@@ -25,9 +25,16 @@
        [image {:source logo-img
                :style  {:width 80 :height 80 :margin-bottom 30}}]
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5}
-                             :on-press #(alert "HELLO!")}
-        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "press me"]]])))
+                             :on-press #(do
+                                          (dispatch [:more-greeting])
+                                          (dispatch [:fx/save-db]))}
+        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Add !"]]
+       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 10}
+                             :on-press #(do
+                                          (dispatch [:set-greeting "Hello"])
+                                          (dispatch [:fx/save-db]))}
+        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])))
 
 (defn init []
-  (dispatch-sync [:initialize-db])
+  (dispatch-sync [:boot/init])
   (.registerComponent app-registry "HundredPushups" #(r/reactify-component app-root)))

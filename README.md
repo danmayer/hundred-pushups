@@ -72,6 +72,15 @@ Or, for both type:
 
 `lein with-profile +tools test-refresh :changes-only`
 
+### Logs
+
+To see log output, run one of the following
+
+```bash
+$ react-native log-ios
+$ react-native log-android
+```
+
 ## License
 
 Copyright © 2016 Ben Brinckerhoff and Dan Mayer
