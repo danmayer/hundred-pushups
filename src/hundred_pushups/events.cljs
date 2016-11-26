@@ -29,11 +29,7 @@
 (defn boot-flow []
   {:first-dispatch [:boot/load-db]
    :rules
-   [
-    {:when :seen? :events [:boot/db-init.ok] :halt? true}
-    ]
-   }
-  )
+   [{:when :seen? :events [:boot/db-init.ok] :halt? true}]})
 
 ;; -- Handlers --------------------------------------------------------------
 
