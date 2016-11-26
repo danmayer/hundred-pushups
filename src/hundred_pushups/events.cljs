@@ -27,13 +27,12 @@
 ;; -- Boot --------------------------------------------------------------
 
 (defn boot-flow []
-  {:first-dispatch [:boot/load-db]
+  {:first-dispatch [:db/load]
    :rules
-   [{:when :seen? :events [:boot/db-init.ok] :halt? true}]})
+   [{:when :seen? :events [:db/init.ok] :halt? true}]})
 
 ;; -- Handlers --------------------------------------------------------------
 
-;; TODO - improve naming scheme
 (def local-storage-db-key :db)
 
 (reg-event-fx
@@ -42,28 +41,28 @@
    {:async-flow (boot-flow)}))
 
 (reg-event-fx
- :boot/load-db
+ :db/load
  (fn [{db :db} [_event-name val]]
-   {:fx/load-db {}}))
+   {:db/load {}}))
 
 (reg-fx
- :fx/load-db
+ :db/load
  (fn load-db-effect [_m]
    (async/take! (get-item local-storage-db-key)
                 (fn [[error value]]
                   (if error
-                    (dispatch [:boot/load-db.err error])
-                    (dispatch [:boot/load-db.ok value]))))))
+                    (dispatch [:db/load.err error])
+                    (dispatch [:db/load.ok value]))))))
 
 (reg-event-fx
- :boot/load-db.ok
+ :db/load.ok
  validate-spec
  (fn [_world [_event-name db-from-local-storage]]
-   {:dispatch [:boot/db-init.ok]
+   {:dispatch [:db/init.ok]
     :db (or db-from-local-storage default-db)}))
 
 (reg-event-db
- :boot/db-init.ok
+ :db/init.ok
  (fn [db [_event]]
    db))
 
@@ -80,26 +79,26 @@
    (update db :greeting #(str % "!"))))
 
 (reg-fx
- :fx/save-db
+ :db/save
  (fn save-db-effect [{db :db}]
    (async/take! (set-item local-storage-db-key db)
                 (fn [[error value]]
                   (if error
-                    (dispatch [:fx/save-db.err error])
-                    (dispatch [:fx/save-db.ok]))))))
+                    (dispatch [:db/save.err error])
+                    (dispatch [:db/save.ok]))))))
 
 (reg-event-fx
- :fx/save-db.er
+ :db/save.er
  (fn [_world event]
    (println event)
    {}))
 
 (reg-event-fx
- :fx/save-db.ok
+ :db/save.ok
  (fn [_world event]
    (println event)))
 
 (reg-event-fx
- :fx/save-db
+ :db/save
  (fn [{db :db} [_event-name _value]]
-   {:fx/save-db {:db db}}))
+   {:db/save {:db db}}))

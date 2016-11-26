@@ -27,12 +27,12 @@
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5}
                              :on-press #(do
                                           (dispatch [:more-greeting])
-                                          (dispatch [:fx/save-db]))}
+                                          (dispatch [:db/save]))}
         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Add !"]]
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 10}
                              :on-press #(do
                                           (dispatch [:set-greeting "Hello"])
-                                          (dispatch [:fx/save-db]))}
+                                          (dispatch [:db/save]))}
         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])))
 
 (defn init []
