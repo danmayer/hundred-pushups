@@ -6,10 +6,7 @@
     [hundred-pushups.db :as db :refer [default-db]]
     [re-frame.core :refer [reg-event-db after reg-event-fx dispatch reg-fx]]
     [cljs.core.async :as async]
-    )
-  ;; TODO - delete?
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  )
+    ))
 
 ;; -- Interceptors ------------------------------------------------------------
 ;;
@@ -42,13 +39,6 @@
 
 ;; TODO - improve naming scheme
 (def local-storage-db-key :db)
-
-;; TODO - remove
-(reg-event-db
- :initialize-db
- validate-spec
- (fn [_ _]
-   default-db))
 
 (reg-event-fx
  :boot/init
