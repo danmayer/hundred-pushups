@@ -15,7 +15,7 @@
 (def logo-img (js/require "./images/cljs.png"))
 
 (defn alert [title]
-      (.alert (.-Alert ReactNative) title))
+  (.alert (.-Alert ReactNative) title))
 
 (defn app-root []
   (let [greeting (subscribe [:get-greeting])]
@@ -29,5 +29,5 @@
         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "press me"]]])))
 
 (defn init []
-      (dispatch-sync [:initialize-db])
-      (.registerComponent app-registry "HundredPushups" #(r/reactify-component app-root)))
+  (dispatch-sync [:boot/init])
+  (.registerComponent app-registry "HundredPushups" #(r/reactify-component app-root)))
