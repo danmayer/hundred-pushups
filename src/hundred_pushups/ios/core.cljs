@@ -17,23 +17,33 @@
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
 
+(defn get-started []
+  )
+
+(defn pushup-form []
+  [:text {:value "test"}]
+  )
+
 (defn app-root []
-  (let [greeting (subscribe [:get-greeting])]
+  (let [last-stage (subscribe [:last-stage])
+        _ (prn "last stage is" @last-stage)]
     (fn []
       [view {:style {:flex-direction "column" :margin 40 :align-items "center"}}
-       [text {:style {:font-size 30 :font-weight "100" :margin-bottom 20 :text-align "center"}} @greeting]
-       [image {:source logo-img
-               :style  {:width 80 :height 80 :margin-bottom 30}}]
-       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5}
+       [text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
+       [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
+       (if @last-stage
+         [text {:style {:color "red" :text-align "center" :font-weight "bold"}} "Test!"]
+         [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5}
+                               :on-press #(do
+                                            (dispatch [:append-progress :started])
+                                            (dispatch [:db/save]))}
+          [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Let's get started"]])
+       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                              :on-press #(do
-                                          (dispatch [:more-greeting])
+                                          (dispatch [:db/reset])
                                           (dispatch [:db/save]))}
-        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Add !"]]
-       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 10}
-                             :on-press #(do
-                                          (dispatch [:set-greeting "Hello"])
-                                          (dispatch [:db/save]))}
-        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])))
+        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]
+       ])))
 
 (defn init []
   (dispatch-sync [:boot/init])

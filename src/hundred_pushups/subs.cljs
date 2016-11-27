@@ -5,3 +5,8 @@
   :get-greeting
   (fn [db _]
     (:greeting db)))
+
+(reg-sub
+ :last-stage
+ (fn [db _]
+   (last (:progress db))))

@@ -63,20 +63,23 @@
 
 (reg-event-db
  :db/init.ok
+ validate-spec
  (fn [db [_event]]
    db))
 
 (reg-event-db
- :set-greeting
+ :db/reset
  validate-spec
- (fn [db [_ value]]
-   (assoc db :greeting value)))
+ (fn [_db [_event]]
+   db/default-db))
 
 (reg-event-db
- :more-greeting
+ :append-progress
  validate-spec
- (fn [db [_event-name _value]]
-   (update db :greeting #(str % "!"))))
+ (fn [db [_event-name stage]]
+   (prn "old db is " db)
+   (prn "event is" stage)
+   (update db :progress conj stage)))
 
 (reg-fx
  :db/save
