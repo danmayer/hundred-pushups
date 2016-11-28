@@ -58,7 +58,7 @@ Open Android project in Android Studio
   * run app "click play button" (select simulator or device)
   * either way app will fail until figwheel is running, but you need the initial build to start figwheel
 * run figwheel
-* re-run the app as above this time it should connect to figwheels prompt 
+* re-run the app as above this time it should connect to figwheels prompt
 
 To use figwheel type:
 
@@ -79,7 +79,7 @@ At the REPL prompt type this:
 
 Changes you make via the REPL or by changing your .cljs files should appear live.
 
-Try this command as an example: 
+Try this command as an example:
 `(dispatch [:set-greeting "Hi everyone"])`
 
 
