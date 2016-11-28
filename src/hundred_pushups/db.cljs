@@ -2,9 +2,10 @@
   (:require [clojure.spec :as s]))
 
 ;; spec of app-db
-(s/def ::greeting string?)
+(s/def ::event keyword?)
+(s/def ::progress (s/coll-of ::event))
 (s/def ::app-db
-  (s/keys :req-un [::greeting]))
+  (s/keys :req-un [::progress]))
 
 ;; initial state of app-db
-(def default-db {:greeting "Hello Clojure in iOS and Android!"})
+(def default-db {:progress []})

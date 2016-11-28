@@ -1,6 +1,6 @@
 {
   "name": "HundredPushups",
-  "interface": "rum",
+  "interface": "reagent6",
   "androidHost": "localhost",
   "iosHost": "localhost",
   "envRoots": {
