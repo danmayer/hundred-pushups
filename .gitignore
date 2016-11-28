@@ -45,6 +45,7 @@ android/keystores/debug.keystore
 index.android.js
 index.ios.js
 target/
+.re-natal
 
 # Figwheel
 #
