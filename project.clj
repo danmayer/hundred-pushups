@@ -10,6 +10,7 @@
                  [org.clojure/clojurescript "1.9.198"]
                  [re-frame "0.8.0"]
                  [reagent "0.6.0" :exclusions [cljsjs/react cljsjs/react-dom cljsjs/react-dom-server]]
+                 
                  ]
   :plugins [[lein-cljsbuild "1.1.4"]
             [lein-figwheel "0.5.8"]]
@@ -17,8 +18,9 @@
   :aliases {"prod-build" ^{:doc "Recompile code with prod profile."}
             ["do" "clean"
              ["with-profile" "prod" "cljsbuild" "once" ]]}
-  :tools {:plugins [[com.jakemccrary/lein-test-refresh "0.14.0"]]}
-  :profiles {:dev {:dependencies [[figwheel-sidecar "0.5.8"]                                  
+  :profiles {:tools {:plugins [[com.jakemccrary/lein-test-refresh "0.18.0"]]
+                     :dependencies [[com.jakemccrary/lein-test-refresh "0.18.0"]]}
+             :dev {:dependencies [[figwheel-sidecar "0.5.8"]                                  
                                   [com.cemerick/piggieback "0.2.1"]]
                    :source-paths ["src" "env/dev"]
                    :cljsbuild    {:builds [{:id           "ios"
