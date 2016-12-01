@@ -19,7 +19,10 @@
             ["do" "clean"
              ["with-profile" "prod" "cljsbuild" "once" ]]}
   :profiles {:tools {:plugins [[com.jakemccrary/lein-test-refresh "0.18.0"]]
-                     :dependencies [[com.jakemccrary/lein-test-refresh "0.18.0"]]}
+                     :dependencies [[com.jakemccrary/lein-test-refresh "0.18.0"]
+                                    [pjstadig/humane-test-output "0.8.1"]]
+                     :injections [(require 'pjstadig.humane-test-output)
+                                  (pjstadig.humane-test-output/activate!)]}
              :dev {:dependencies [[figwheel-sidecar "0.5.8"]                                  
                                   [com.cemerick/piggieback "0.2.1"]]
                    :source-paths ["src" "env/dev"]
