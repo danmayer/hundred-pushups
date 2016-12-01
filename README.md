@@ -1,6 +1,6 @@
 # hundred-pushups
 
-A mobile app based on the plan at http://www.100pushups.com/
+A mobile app unoffially based on the plan at [100 Pushups](http://www.100pushups.com). This app is *not* endorsed by [100 Pushups](http://www.100pushups.com)!
 
 ## Usage
 
