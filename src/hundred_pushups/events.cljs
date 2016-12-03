@@ -74,12 +74,11 @@
    db/default-db))
 
 (reg-event-db
- :append-progress
+ :complete-stage
  validate-spec
  (fn [db [_event-name stage]]
-   (prn "old db is " db)
-   (prn "event is" stage)
-   (update db :progress conj stage)))
+   (prn "completing stage " stage)
+   (update db :completed-stages conj stage)))
 
 (reg-fx
  :db/save
@@ -105,3 +104,44 @@
  :db/save
  (fn [{db :db} [_event-name _value]]
    {:db/save {:db db}}))
+
+(reg-event-db
+ :ui-state/set
+  validate-spec
+ (fn [db [_event-name path val]]
+   (update db :ui-state #(assoc-in % path val))))
+
+;; https://github.com/weavejester/medley/blob/master/src/medley/core.cljc#L11
+(defn dissoc-in
+    "Dissociate a value in a nested assocative structure, identified by a sequence
+  of keys. Any collections left empty by the operation will be dissociated from
+  their containing structures."
+  [m ks]
+  (if-let [[k & ks] (seq ks)]
+    (if (seq ks)
+      (let [v (dissoc-in (get m k) ks)]
+        (if (empty? v)
+          (dissoc m k)
+          (assoc m k v)))
+      (dissoc m k))
+        m))
+
+(reg-event-db
+ :ui-state/clear
+  validate-spec
+  (fn [db [_event-name paths]]
+    (reduce
+     (fn [d path]
+       (update db :ui-state #(dissoc-in % path))
+       )
+     db
+     paths)))
+
+(reg-event-db
+ :append-test
+  validate-spec
+  (fn [db [_event-name test-circuit]]
+    (prn "test-circuit" test-circuit)
+    (prn "show me entire db" db)
+    (prn "test-log " (:test-log db))
+    (update db :test-log conj test-circuit)))
