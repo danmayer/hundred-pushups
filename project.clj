@@ -6,7 +6,7 @@
   :dependencies [
                  [core-async-storage "0.1.1"]
                  [day8.re-frame/async-flow-fx "0.0.6"]
-                 [org.clojure/clojure "1.9.0-alpha10"]
+                 [org.clojure/clojure "1.9.0-alpha14"]
                  [org.clojure/clojurescript "1.9.198"]
                  [re-frame "0.8.0"]
                  [reagent "0.6.0" :exclusions [cljsjs/react cljsjs/react-dom cljsjs/react-dom-server]]
@@ -20,7 +20,10 @@
              ["with-profile" "prod" "cljsbuild" "once" ]]}
   :profiles {:tools {:plugins [[com.jakemccrary/lein-test-refresh "0.18.0"]
                                [venantius/ultra "0.5.0"]]}
-             :dev {:dependencies [[figwheel-sidecar "0.5.8"]                                                           [com.cemerick/piggieback "0.2.1"]]
+             :dev {:dependencies [[figwheel-sidecar "0.5.8"]
+                                  [com.cemerick/piggieback "0.2.1"]
+                                  [org.clojure/test.check "0.9.0"]
+                                  [com.gfredericks/test.chuck "0.2.7"]]
                    :source-paths ["src" "env/dev"]
                    :cljsbuild    {:builds [{:id           "ios"
                                             :source-paths ["src" "env/dev"]
