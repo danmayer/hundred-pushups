@@ -15,7 +15,7 @@
 (def image (r/adapt-react-class (.-Image ReactNative)))
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
 
-(def pushup-form-url "http://www.100pushups.com/#technique")
+(def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
 
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
