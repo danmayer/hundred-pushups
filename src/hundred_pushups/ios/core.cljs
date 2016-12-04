@@ -121,7 +121,6 @@
       [view {:style {:flex-direction "column" :margin 40 :align-items "center"}}
        [text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
-       (prn "stage is " @stage)
        (case @stage
          :get-started [get-started]
          :learn-pushup-form [learn-pushup-form]

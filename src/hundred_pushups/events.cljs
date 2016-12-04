@@ -78,7 +78,6 @@
  :complete-stage
  validate-spec
  (fn [db [_event-name stage]]
-   (prn "completing stage " stage)
    (update db :completed-stages conj stage)))
 
 (reg-fx
@@ -142,9 +141,6 @@
  :append-test
  validate-spec
   (fn [db [_event-name test-circuit]]
-    (prn "test-circuit" test-circuit)
-    (prn "show me entire db" db)
-    (prn "test-log " (:test-log db))
     (update db :test-log conj test-circuit)))
 
 (reg-event-db
