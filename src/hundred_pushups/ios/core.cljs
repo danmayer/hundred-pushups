@@ -36,7 +36,6 @@
     ]
    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin 10}
                          :on-press #(do
-                                      ;; TODO - change this to :complete-stage
                                       (dispatch [:complete-stage :learn-pushup-form])
                                       (dispatch [:db/save]))}
     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "OK, I've got it."]]])
@@ -46,7 +45,6 @@
   (let [ui-state (subscribe [:ui-state/get])]
     (fn []
       [view {}
-       [text {:style {}} @ui-state] ;; TODO - remove
        [text {:style {:text-align "center"}} "Do as many good pushups as you can."]
        [text {:style {:text-align "center"}} "Stop when it takes more than five seconds to do a rep or when you can't do any more reps."]
        [text {} "Reps:"]
@@ -66,7 +64,6 @@
   (let [ui-state (subscribe [:ui-state/get])]
     (fn []
       [view {}
-       [text {:style {}} @ui-state] ;; TODO - remove
        [text {:style {:text-align "center"}} "Hold a plank for as many breaths as you can (not seconds!)"]
        [text {:style {:text-align "center"}} "Stop when your form starts to get bad (e.g. sagging body)"]
        [text {} "Plank breadths:"]
