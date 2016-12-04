@@ -49,3 +49,13 @@
      (if last-circuit
        (map-vals inc last-circuit)
        (map-vals half last-test))}))
+
+(s/fdef complete-day
+        :args (s/cat
+               :circuit-log :exr.circuit/log
+               :day :exr/day)
+        :ret :exr.circuit/log)
+(defn complete-day [circuit-log day]
+  (into circuit-log
+        (repeat (:exr/sets day)
+                (:exr/circuit day))))

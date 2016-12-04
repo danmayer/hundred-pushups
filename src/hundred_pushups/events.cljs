@@ -6,6 +6,7 @@
     [hundred-pushups.db :as db :refer [default-db]]
     [re-frame.core :refer [reg-event-db after reg-event-fx dispatch reg-fx]]
     [cljs.core.async :as async]
+    [hundred-pushups.core :as core]
     ))
 
 ;; -- Interceptors ------------------------------------------------------------
@@ -139,9 +140,15 @@
 
 (reg-event-db
  :append-test
-  validate-spec
+ validate-spec
   (fn [db [_event-name test-circuit]]
     (prn "test-circuit" test-circuit)
     (prn "show me entire db" db)
     (prn "test-log " (:test-log db))
     (update db :test-log conj test-circuit)))
+
+(reg-event-db
+ :complete-day
+ validate-spec
+ (fn [db [_event-name day-schedule]]
+   (update db :log core/complete-day day-schedule)))
