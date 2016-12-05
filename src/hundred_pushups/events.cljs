@@ -6,6 +6,7 @@
     [hundred-pushups.db :as db :refer [default-db]]
     [re-frame.core :refer [reg-event-db after reg-event-fx dispatch reg-fx]]
     [cljs.core.async :as async]
+    [hundred-pushups.core :as core]
     ))
 
 ;; -- Interceptors ------------------------------------------------------------
@@ -74,12 +75,10 @@
    db/default-db))
 
 (reg-event-db
- :append-progress
+ :complete-stage
  validate-spec
  (fn [db [_event-name stage]]
-   (prn "old db is " db)
-   (prn "event is" stage)
-   (update db :progress conj stage)))
+   (update db :completed-stages conj stage)))
 
 (reg-fx
  :db/save
@@ -105,3 +104,47 @@
  :db/save
  (fn [{db :db} [_event-name _value]]
    {:db/save {:db db}}))
+
+(reg-event-db
+ :ui-state/set
+  validate-spec
+ (fn [db [_event-name path val]]
+   (update db :ui-state #(assoc-in % path val))))
+
+;; https://github.com/weavejester/medley/blob/master/src/medley/core.cljc#L11
+(defn dissoc-in
+    "Dissociate a value in a nested assocative structure, identified by a sequence
+  of keys. Any collections left empty by the operation will be dissociated from
+  their containing structures."
+  [m ks]
+  (if-let [[k & ks] (seq ks)]
+    (if (seq ks)
+      (let [v (dissoc-in (get m k) ks)]
+        (if (empty? v)
+          (dissoc m k)
+          (assoc m k v)))
+      (dissoc m k))
+        m))
+
+(reg-event-db
+ :ui-state/clear
+  validate-spec
+  (fn [db [_event-name paths]]
+    (reduce
+     (fn [d path]
+       (update db :ui-state #(dissoc-in % path))
+       )
+     db
+     paths)))
+
+(reg-event-db
+ :append-test
+ validate-spec
+  (fn [db [_event-name test-circuit]]
+    (update db :test-log conj test-circuit)))
+
+(reg-event-db
+ :complete-day
+ validate-spec
+ (fn [db [_event-name day-schedule]]
+   (update db :log core/complete-day day-schedule)))

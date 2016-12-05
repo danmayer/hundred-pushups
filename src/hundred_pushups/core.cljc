@@ -14,7 +14,7 @@
 (s/def :exr.circuit/log (s/coll-of :exr/circuit))
 (s/def :exr/day
   (s/keys :req [:exr/sets :exr/circuit]))
-(s/def :exr.circuit/test-log (s/coll-of :exr/circuit :min-count 1))
+(s/def :exr.circuit/test-log (s/coll-of :exr/circuit))
 
 ;;;;;; private ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -37,7 +37,8 @@
 
 (s/fdef suggested-day
         :args (s/cat
-               :test-log :exr.circuit/test-log
+               :test-log (s/and :exr.circuit/test-log
+                                (fn [x] (pos? (count x))))
                :circuit-log :exr.circuit/log)
         :ret :exr/day)
 (defn suggested-day [test-log circuit-log]
@@ -48,3 +49,13 @@
      (if last-circuit
        (map-vals inc last-circuit)
        (map-vals half last-test))}))
+
+(s/fdef complete-day
+        :args (s/cat
+               :circuit-log :exr.circuit/log
+               :day :exr/day)
+        :ret :exr.circuit/log)
+(defn complete-day [circuit-log day]
+  (into circuit-log
+        (repeat (:exr/sets day)
+                (:exr/circuit day))))

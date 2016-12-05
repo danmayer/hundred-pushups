@@ -9,9 +9,7 @@
 
 (defn successful-day-log [test-log log]
   (let [next-day (suggested-day test-log log)]
-    (into log
-          (repeat (:exr/sets next-day)
-                  (:exr/circuit next-day)))))
+    (complete-day log next-day)))
 
 (deftest suggested-day-spec
   (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day)]
