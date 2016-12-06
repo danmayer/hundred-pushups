@@ -25,19 +25,19 @@
 (deftest suggesting-sets-and-reps
   (testing "suggests 4 x 50% reps (rounding up) after initial test"
     (is (= {:exr/circuit
-            {:exr.pushup/reps 5 :exr.plank/reps 8}
+            {:exr/pushup-reps 5 :exr/plank-reps 8}
             :exr/sets 4}
            (suggested-day
-            [{:exr.pushup/reps 10
-              :exr.plank/reps 15}]
+            [{:exr/pushup-reps 10
+              :exr/plank-reps 15}]
             []))))
 
   (testing "suggests 4 x 50% + 1 after one day"
     (let [ts #inst "2016-01-01"]
       (is (= {:exr/circuit
-              {:exr.pushup/reps 6 :exr.plank/reps 9}
+              {:exr/pushup-reps 6 :exr/plank-reps 9}
               :exr/sets 4}
-             (let [test-log [{:exr.pushup/reps 10 :exr.plank/reps 15}]
+             (let [test-log [{:exr/pushup-reps 10 :exr/plank-reps 15}]
                    circuit-log []]
                (->> circuit-log
                     (complete-next-day ts test-log)
@@ -46,9 +46,9 @@
   (testing "suggests 4 x 50% + 2 after two day"
     (let [ts #inst "2016-01-01"]
       (is (= {:exr/circuit
-              {:exr.pushup/reps 7 :exr.plank/reps 10}
+              {:exr/pushup-reps 7 :exr/plank-reps 10}
               :exr/sets 4}
-             (let [test-log [{:exr.pushup/reps 10 :exr.plank/reps 15}]
+             (let [test-log [{:exr/pushup-reps 10 :exr/plank-reps 15}]
                    circuit-log []]
                (->> circuit-log
                     (complete-next-day ts test-log)
@@ -63,8 +63,8 @@
      (let [new-circ (:exr/circuit (suggested-day test-log circuit-log))
            last-circuit (last circuit-log)]
        (when (and new-circ last-circuit)
-         (is (<= (:exr.pushup/reps last-circuit) (:exr.pushup/reps new-circ)))
-         (is (<= (:exr.plank/reps last-circuit) (:exr.plank/reps new-circ))))))))
+         (is (<= (:exr/pushup-reps last-circuit) (:exr/pushup-reps new-circ)))
+         (is (<= (:exr/plank-reps last-circuit) (:exr/plank-reps new-circ))))))))
 
 (deftest complete-day-spec
   (let [{args-sp :args ret-sp :ret} (s/get-spec #'complete-day)]
