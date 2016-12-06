@@ -7,7 +7,7 @@
 
 (use-fixtures :once instrument-all check-asserts)
 
-(defn successful-day-log [test-log ts log]
+(defn complete-next-day [ts test-log log]
   (let [next-day (suggested-day test-log log)]
     (complete-day log next-day ts)))
 
@@ -40,7 +40,7 @@
              (let [test-log [{:exr.pushup/reps 10 :exr.plank/reps 15}]
                    circuit-log []]
                (->> circuit-log
-                    (successful-day-log test-log ts)
+                    (complete-next-day ts test-log)
                     (suggested-day test-log)))))))
 
   (testing "suggests 4 x 50% + 2 after two day"
@@ -51,8 +51,8 @@
              (let [test-log [{:exr.pushup/reps 10 :exr.plank/reps 15}]
                    circuit-log []]
                (->> circuit-log
-                    (successful-day-log test-log ts)
-                    (successful-day-log test-log ts)
+                    (complete-next-day ts test-log)
+                    (complete-next-day ts test-log)
                     (suggested-day test-log)))))))
 
   (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day)]
