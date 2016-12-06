@@ -8,6 +8,7 @@
   (s/keys :req [:exr/sets :exr/circuit]))
 (s/def :exr/ts inst?)
 
+;; TODO - move this under single exr namespace
 (s/def :exr.pushup/reps :exr/reps)
 (s/def :exr.plank/reps :exr/reps)
 (s/def :exr/sets (s/int-in 4 11))
@@ -15,8 +16,10 @@
 (s/def :exr/circuit
   (s/keys :req [:exr.pushup/reps :exr.plank/reps]
           :opt [:exr/ts]))
-(s/def :exr.circuit/log (s/coll-of :exr/circuit))
-(s/def :exr.circuit/test-log (s/coll-of :exr/circuit))
+(s/def :exr/test :exr/circuit)
+;; TODO flatten namespace
+(s/def :exr.circuit/circuit-log (s/coll-of :exr/circuit))
+(s/def :exr.circuit/test-log (s/coll-of :exr/test))
 
 ;;;;;; private ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -47,7 +50,7 @@
         :args (s/cat
                :test-log (s/and :exr.circuit/test-log
                                 (fn [x] (pos? (count x))))
-               :circuit-log :exr.circuit/log)
+               :circuit-log :exr.circuit/circuit-log)
         :ret :exr/day)
 (defn suggested-day [test-log circuit-log]
   (let [reps [:exr.pushup/reps :exr.plank/reps]
@@ -61,10 +64,10 @@
 
 (s/fdef complete-day
         :args (s/cat
-               :circuit-log :exr.circuit/log
+               :circuit-log :exr.circuit/circuit-log
                :day :exr/day
                :ts :exr/ts)
-        :ret :exr.circuit/log)
+        :ret :exr.circuit/circuit-log)
 (defn complete-day [circuit-log day ts]
   (into circuit-log
          (repeat (:exr/sets day)

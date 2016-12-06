@@ -10,11 +10,10 @@
   (s/keys :req-un [::completed-stages
                    ::ui-state
                    :exr.circuit/test-log
-                   :exr.circuit/log]))
+                   :exr.circuit/circuit-log]))
 
 ;; initial state of app-db
 (def default-db {:completed-stages []
                  :ui-state {}
                  :test-log []
-                 ;; TODO - rename this to exercise-log
-                 :log []})
+                 :circuit-log []})

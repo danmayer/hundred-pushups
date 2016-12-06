@@ -1,13 +1,12 @@
 (ns hundred-pushups.events
   (:require
+    [cljs.core.async :as async]
     [clojure.spec :as s]
     [day8.re-frame.async-flow-fx :as async-flow-fx]
     [glittershark.core-async-storage :refer [get-item set-item]]
-    [hundred-pushups.db :as db :refer [default-db]]
-    [re-frame.core :refer [reg-event-db after reg-event-fx dispatch reg-fx]]
-    [cljs.core.async :as async]
     [hundred-pushups.core :as core]
-    ))
+    [hundred-pushups.db :as db :refer [default-db]]
+    [re-frame.core :refer [reg-event-db after reg-event-fx dispatch reg-fx]]))
 
 ;; -- Interceptors ------------------------------------------------------------
 ;;
@@ -132,8 +131,7 @@
   (fn [db [_event-name paths]]
     (reduce
      (fn [d path]
-       (update db :ui-state #(dissoc-in % path))
-       )
+       (update db :ui-state #(dissoc-in % path)))
      db
      paths)))
 

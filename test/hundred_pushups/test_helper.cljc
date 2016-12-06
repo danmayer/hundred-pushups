@@ -10,7 +10,8 @@
 
 (defn instrument-all [f]
   (st/instrument)
-  (f))
+  (f)
+  (st/unstrument))
 
 (defn check-asserts [f]
   (let [old-value (s/check-asserts?)]
