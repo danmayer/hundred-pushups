@@ -16,4 +16,5 @@
 (def default-db {:completed-stages []
                  :ui-state {}
                  :test-log []
+                 ;; TODO - rename this to exercise-log
                  :log []})

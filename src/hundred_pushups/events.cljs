@@ -147,4 +147,4 @@
  :complete-day
  validate-spec
  (fn [db [_event-name day-schedule]]
-   (update db :log core/complete-day day-schedule)))
+   (update db :log core/complete-day day-schedule (core/now))))
