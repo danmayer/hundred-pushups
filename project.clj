@@ -19,7 +19,9 @@
             ["do" "clean"
              ["with-profile" "prod" "cljsbuild" "once" ]]}
   :profiles {:tools {:plugins [[com.jakemccrary/lein-test-refresh "0.18.0"]
-                               [venantius/ultra "0.5.0"]]}
+                               [venantius/ultra "0.5.0"]]
+                     :dependencies [[proto-repl-charts "0.3.1"]
+                                    [proto-repl "0.3.1"]]}
              :dev {:dependencies [[figwheel-sidecar "0.5.8"]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/test.check "0.9.0"]
