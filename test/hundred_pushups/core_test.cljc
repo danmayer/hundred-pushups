@@ -47,7 +47,7 @@
     (let [ts #inst "2016-01-01"]
       (is (= {:exr/circuit
               {:exr/pushup-reps 7 :exr/plank-reps 10}
-              :exr/sets 4}
+              :exr/sets 5}
              (let [test-log [{:exr/pushup-reps 10 :exr/plank-reps 15}]
                    circuit-log []]
                (->> circuit-log

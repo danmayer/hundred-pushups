@@ -7,7 +7,7 @@
                  [core-async-storage "0.1.1"]
                  [day8.re-frame/async-flow-fx "0.0.6"]
                  [org.clojure/clojure "1.9.0-alpha14"]
-                 [org.clojure/clojurescript "1.9.198"]
+                 [org.clojure/clojurescript "1.9.293"]
                  [re-frame "0.8.0"]
                  [reagent "0.6.0" :exclusions [cljsjs/react cljsjs/react-dom cljsjs/react-dom-server]]
                  

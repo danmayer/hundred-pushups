@@ -7,7 +7,6 @@
             [clojure.test.check.random :refer [IRandom]]
             [clojure.test.check.rose-tree :as rose]))
 
-
 (defn instrument-all [f]
   (st/instrument)
   (f)

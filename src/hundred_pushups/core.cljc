@@ -68,6 +68,6 @@
         :ret :exr/circuit-log)
 (defn complete-day [circuit-log day ts]
   (into circuit-log
-         (repeat (:exr/sets day)
-                 (assoc (:exr/circuit day)
-                        :exr/ts ts))))
+        (repeat (:exr/sets day)
+                (assoc (:exr/circuit day)
+                       :exr/ts ts))))
