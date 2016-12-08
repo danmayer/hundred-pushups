@@ -33,4 +33,4 @@
  :days-exercise
  (fn [db _]
    (core/suggested-day (:test-log db)
-                       (:log db))))
+                       (:circuit-log db))))

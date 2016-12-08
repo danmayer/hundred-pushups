@@ -75,8 +75,8 @@
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin 10}
                              :on-press #(do
                                           (dispatch [:append-test
-                                                     {:exr.pushup/reps (js/parseInt (:pushup-reps-text @ui-state))
-                                                      :exr.plank/reps (js/parseInt (:plank-reps-text @ui-state))
+                                                     {:exr/pushup-reps (js/parseInt (:pushup-reps-text @ui-state))
+                                                      :exr/plank-reps (js/parseInt (:plank-reps-text @ui-state))
                                                       }
                                                      ])
                                           (dispatch [:ui-state/clear [[:plank-reps-text]
@@ -102,10 +102,8 @@
       (for [x (range (:exr/sets schedule))]
         [view {:key x}
          [text {:style {:font-size 18 :font-weight "600" :margin-top 10}} (str "Set" x)]
-         [text {} (str (:exr.pushup/reps circuit) " pushups")]
-         [text {} (str "Hold plank for "(:exr.plank/reps circuit) " breaths")]
-         ]
-        )
+         [text {} (str (:exr/pushup-reps circuit) " pushups")]
+         [text {} (str "Hold plank for "(:exr/plank-reps circuit) " breaths")]])
       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                             :on-press #(do
                                          (dispatch [:complete-day schedule])

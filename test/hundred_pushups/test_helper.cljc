@@ -7,10 +7,10 @@
             [clojure.test.check.random :refer [IRandom]]
             [clojure.test.check.rose-tree :as rose]))
 
-
 (defn instrument-all [f]
   (st/instrument)
-  (f))
+  (f)
+  (st/unstrument))
 
 (defn check-asserts [f]
   (let [old-value (s/check-asserts?)]
