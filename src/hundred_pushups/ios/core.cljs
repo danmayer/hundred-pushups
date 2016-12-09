@@ -98,6 +98,7 @@
 
 (defn show-day []
   [view {:style {:flex-direction "column" :align-items "center"}}
+   [text {} @(subscribe [:ui-state/get])]
    [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Today's exercise"]
    (let [schedule @(subscribe [:days-exercise])
          circuit (:exr/circuit schedule)]
