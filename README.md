@@ -54,7 +54,7 @@ Open Android project in Android Studio
 * Android Studio, open project `./android`
 * open emulator or connect device
 * Run the app
-  * `react-native run-android`
+  * `react-native run-android` `#this is much faster` 
   * run app "click play button" (select simulator or device)
   * either way app will fail until figwheel is running, but you need the initial build to start figwheel
 * run figwheel
@@ -64,6 +64,8 @@ To use figwheel type:
 
 ```bash
 re-natal use-android-device avd
+or
+re-natal use-android-device real
 re-natal use-figwheel
 lein figwheel android
 ```
