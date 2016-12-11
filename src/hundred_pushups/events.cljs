@@ -105,6 +105,12 @@
    {:db/save {:db db}}))
 
 (reg-event-db
+ :ui-mode-set
+  validate-spec
+ (fn [db [_event-name path val]]
+   (update db :ui-mode #(assoc-in % path val))))
+
+(reg-event-db
  :ui-state/set
   validate-spec
  (fn [db [_event-name path val]]

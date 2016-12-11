@@ -6,9 +6,11 @@
 (s/def ::event keyword?)
 (s/def ::completed-stages (s/coll-of ::event))
 (s/def ::ui-state map?)
+(s/def ::ui-mode map?)
 (s/def ::app-db
   (s/keys :req-un [::completed-stages
                    ::ui-state
+                   ::ui-mode
                    :exr/test-log
                    :exr/circuit-log]))
 
@@ -16,4 +18,5 @@
 (def default-db {:completed-stages []
                  :ui-state {}
                  :test-log []
-                 :circuit-log []})
+                 :circuit-log []
+                 :ui-mode {}})
