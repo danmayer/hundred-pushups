@@ -110,19 +110,43 @@
                                          (dispatch [:db/save]))}
        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "I did it"]]])])
 
+(defn set-schedule []
+  [view {:style {:flex-direction "column" :align-items "center"}}
+   [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]])
+
+(defn invalid-mode []
+  [view {:style {:flex-direction "column" :align-items "center"}}
+   [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Bad user, how did you get here."]])
+
+(defn show-stage [stage]
+  [view {:style {:flex-direction "column" :align-items "center"}}
+    [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} stage]
+    (case stage
+      :get-started [get-started]
+      :learn-pushup-form [learn-pushup-form]
+      :do-pushup-test [do-pushup-test]
+      :do-plank-test [do-plank-test]
+      :show-day [show-day]
+      [invalid-stage])
+    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                        :on-press #(do
+                                     (dispatch [:ui-mode-set [:current-mode] :schedules])
+                                     (dispatch [:db/save]))}
+     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Set Schedule"]]])
+
 (defn app-root []
-  (let [stage (subscribe [:stage])]
+  (let [stage (subscribe [:stage])
+        mode (subscribe [:ui-mode/get])]
     (fn []
       [view {:style {:flex-direction "column" :margin 40 :align-items "center"}}
        [text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
-       (case @stage
-         :get-started [get-started]
-         :learn-pushup-form [learn-pushup-form]
-         :do-pushup-test [do-pushup-test]
-         :do-plank-test [do-plank-test]
-         :show-day [show-day]
-         [invalid-stage])
+
+       ;;[text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} @mode]
+       (case @mode
+         :stages [show-stage @stage]
+         :schedules [set-schedule]
+         [invalid-mode])
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                              :on-press #(do
                                           (dispatch [:db/reset])
