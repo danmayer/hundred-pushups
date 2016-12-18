@@ -116,6 +116,13 @@
     (fn []
       [view {}
        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]
+       ;;TODO how to do a select box
+       [text {} "Day:"]
+       [text-input {:style {:height 40 :border-color "grey" :border-width 1}
+                        :default-value (:schedule-day-text @ui-state)
+                        :on-change-text (fn [text]
+                                     (dispatch [:ui-state/set [:schedule-day-text] text])
+                                          (dispatch [:db/save]))}]
        [text {} "Start:"]
        [text-input {:style {:height 40 :border-color "grey" :border-width 1}
                         :default-value (:start-text @ui-state)
@@ -129,6 +136,11 @@
                                      (dispatch [:ui-state/set [:end-text] text])
                                           (dispatch [:db/save]))}]
 
+       ;; TODO scrolling
+       ;; TODO input validation
+       ;; Refactor formatting to core out of UI
+       ;; setup https://github.com/clj-time/clj-time
+       ;; use JS plugins https://github.com/xgfe/react-native-datepicker https://www.npmjs.com/package/react-native-date-time-picker
        ;;[text {} "list:" (str @white-list)]
        ;;TODO ben why can't I use doseq
        ;;(doseq [[day times] @white-list]
@@ -142,7 +154,7 @@
 
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                         :on-press #(do
-                                     (dispatch [:ui-mode-set [:current-mode] :schedules])
+                                     (dispatch [:save-white-list (:schedule-day-text @ui-state) (:start-text @ui-state) (:end-text @ui-state)])
                                      (dispatch [:db/save]))}
          [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Save Schedule"]]
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
