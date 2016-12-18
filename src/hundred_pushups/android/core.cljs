@@ -111,8 +111,47 @@
        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "I did it"]]])])
 
 (defn set-schedule []
-  [view {:style {:flex-direction "column" :align-items "center"}}
-   [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]])
+  (let [ui-state (subscribe [:ui-state/get])
+        white-list (subscribe [:schedule/get-whitelist])]
+    (fn []
+      [view {}
+       [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]
+       [text {} "Start:"]
+       [text-input {:style {:height 40 :border-color "grey" :border-width 1}
+                        :default-value (:start-text @ui-state)
+                        :on-change-text (fn [text]
+                                     (dispatch [:ui-state/set [:start-text] text])
+                                          (dispatch [:db/save]))}]
+       [text {} "End:"]
+       [text-input {:style {:height 40 :border-color "grey" :border-width 1}
+                        :default-value (:end-text @ui-state)
+                        :on-change-text (fn [text]
+                                     (dispatch [:ui-state/set [:end-text] text])
+                                          (dispatch [:db/save]))}]
+
+       ;;[text {} "list:" (str @white-list)]
+       ;;TODO ben why can't I use doseq
+       ;;(doseq [[day times] @white-list]
+       ;;  (fn []
+       ;;   [view {:key day}
+       ;;    [text {} "day:" (str day)]]))
+
+       (for [row @white-list]
+        [view {:key row}
+         [text {:style {:font-size 18 :font-weight "600" :margin-top 10}} (str (name(first row)) ": " (clojure.string/join "-" (last row)))]])
+
+       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                        :on-press #(do
+                                     (dispatch [:ui-mode-set [:current-mode] :schedules])
+                                     (dispatch [:db/save]))}
+         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Save Schedule"]]
+       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                        :on-press #(do
+                                     (dispatch [:ui-mode-set [:current-mode] :stages])
+                                     (dispatch [:db/save]))}
+         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Back"]]
+       ])))
+
 
 (defn invalid-mode []
   [view {:style {:flex-direction "column" :align-items "center"}}
@@ -132,7 +171,12 @@
                         :on-press #(do
                                      (dispatch [:ui-mode-set [:current-mode] :schedules])
                                      (dispatch [:db/save]))}
-     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Set Schedule"]]])
+     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Set Schedule"]]
+    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                             :on-press #(do
+                                          (dispatch [:db/reset])
+                                          (dispatch [:db/save]))}
+     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])
 
 (defn app-root []
   (let [stage (subscribe [:stage])
@@ -142,16 +186,10 @@
        [text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
 
-       ;;[text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} @mode]
        (case @mode
          :stages [show-stage @stage]
          :schedules [set-schedule]
          [invalid-mode])
-       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                             :on-press #(do
-                                          (dispatch [:db/reset])
-                                          (dispatch [:db/save]))}
-        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]
        ])))
 
 
