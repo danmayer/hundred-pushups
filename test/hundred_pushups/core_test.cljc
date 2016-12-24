@@ -73,3 +73,12 @@
      20
      [args (s/gen args-sp)]
      (is (conforms-to? ret-sp (apply complete-day args))))))
+
+(deftest format-whitelist-row-test
+  (is (= "Monday: 9AM-5PM", (format-whitelist-row ["Monday" ["9AM" "5PM"]])))
+  (is (= "Monday: 9AM-5PM", (format-whitelist-row [:Monday ["9AM" "5PM"]])))
+  )
+
+;;given current date/time work-day?
+
+;; given current date return array datetimes ranges [[timestampe timestamp]]
