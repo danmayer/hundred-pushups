@@ -16,4 +16,4 @@
 (def default-db {:completed-stages []
                  :ui-state {}
                  :test-log []
-                 :circuit-log []})
+                 :completed-circuit-log []})
