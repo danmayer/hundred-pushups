@@ -12,12 +12,12 @@
 
 ;;;;;; specs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(s/def :exr/zero-or-pos-int (s/or :pos pos-int?
-                                  :zero zero?))
+(s/def :exr/zero-or-pos-int (s/and int?
+                                   #(<= 0 %)))
 (s/def :exr/reps :exr/zero-or-pos-int)
 (s/def :exr/pushup-reps :exr/reps)
 (s/def :exr/plank-reps :exr/reps)
-(s/def :exr/sets (s/int-in 4 11))
+(s/def :exr/sets (s/int-in 4 20))
 (s/def :exr/ts inst?)
 
 (s/def :exr/circuit
