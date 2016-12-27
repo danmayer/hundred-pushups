@@ -71,3 +71,7 @@
         (repeat (:exr/sets day)
                 (assoc (:exr/circuit day)
                        :exr/ts ts))))
+
+
+(defn format-whitelist-row[row]
+  (str (name(first row)) ": " (clojure.string/join "-" (last row))))

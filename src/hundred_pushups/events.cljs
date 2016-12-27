@@ -152,3 +152,15 @@
  validate-spec
  (fn [db [_event-name day-schedule]]
    (update db :circuit-log core/complete-day day-schedule (core/now))))
+
+(reg-event-db
+ :save-white-list
+ validate-spec
+ (fn [db [_event-name day start end]]
+   (update db :schedules #(assoc-in % [:white-list (keyword day)] [start end]))))
+
+(reg-event-db
+ :remove-from-whitelist
+ validate-spec
+ (fn [db [_event-name day]]
+   (update db :schedules #(dissoc-in % [:white-list (keyword day)]))))

@@ -3,7 +3,8 @@
             [clojure.pprint :as pp]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [hundred-pushups.events]
-            [hundred-pushups.subs]))
+            [hundred-pushups.subs]
+            [hundred-pushups.core :as core]))
 
 (def ReactNative (js/require "react-native"))
 
@@ -11,9 +12,12 @@
 (def linking (.-Linking ReactNative))
 (def text (r/adapt-react-class (.-Text ReactNative)))
 (def text-input (r/adapt-react-class (.-TextInput ReactNative)))
+(def picker (r/adapt-react-class (.-Picker ReactNative)))
+(def picker-item (r/adapt-react-class (.-Picker.Item ReactNative)))
 (def view (r/adapt-react-class (.-View ReactNative)))
 (def image (r/adapt-react-class (.-Image ReactNative)))
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
+(def scroll-view (r/adapt-react-class ReactNative.ScrollView))
 
 (def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
 
@@ -111,8 +115,81 @@
        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "I did it"]]])])
 
 (defn set-schedule []
-  [view {:style {:flex-direction "column" :align-items "center"}}
-   [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]])
+  (let [ui-state (subscribe [:ui-state/get])
+        white-list (subscribe [:schedule/get-whitelist])]
+    (fn []
+      [view
+        ;;[text {} @ui-state]
+        ;;[text {} white-list]
+
+        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]
+
+        (when-not (nil? (:schedule-error @ui-state))
+          [text {:style {:color "red" :text-align "center" :font-weight "bold"}} (:schedule-error @ui-state)])
+
+        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                              :on-press #(do
+                                           (if (not-any? nil? [(:schedule-day-text @ui-state) (:start-text @ui-state) (:end-text @ui-state)])
+                                             (do
+                                              (dispatch [:save-white-list (:schedule-day-text @ui-state) (:start-text @ui-state) (:end-text @ui-state)])
+                                              (dispatch [:ui-state/set [:schedule-error] nil])
+                                              (dispatch [:ui-state/set [:start-text] nil])
+                                              (dispatch [:ui-state/set [:end-text] nil])
+                                              (dispatch [:db/save]))
+                                             (do
+                                              (dispatch [:ui-state/set [:schedule-error] "fill in all schedule values"])
+                                              (dispatch [:db/save]))
+                                             ))}
+         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Save Schedule"]]
+        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                              :on-press #(do
+                                           (dispatch [:ui-mode-set [:current-mode] :stages])
+                                           (dispatch [:db/save]))}
+         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Back"]]
+
+
+        [picker {:selected-value (:schedule-day-text @ui-state)
+                 :on-value-change (fn [item-data]
+                                       (dispatch [:ui-state/set [:schedule-day-text] item-data])
+                                       (dispatch [:db/save]))}
+          [picker-item {:label"Monday" :value "monday"}]
+         [picker-item {:label"Tuesday" :value "tuesday"}]
+         [picker-item {:label"Wednesday" :value "wednesday"}]
+         [picker-item {:label"Thursday" :value "thursday"}]
+         [picker-item {:label"Friday" :value "friday"}]
+         [picker-item {:label"Saturday" :value "saturday"}]
+         [picker-item {:label"Sunday" :value "sunday"}]]
+
+        [text {} "Start:"]
+        [text-input {:style {:height 40 :border-color "grey" :border-width 1}
+                     :default-value (:start-text @ui-state)
+                     :on-change-text (fn [text]
+                                       (dispatch [:ui-state/set [:start-text] text])
+                                       (dispatch [:db/save]))}]
+        [text {} "End:"]
+        [text-input {:style {:height 40 :border-color "grey" :border-width 1}
+                     :default-value (:end-text @ui-state)
+                     :on-change-text (fn [text]
+                                       (dispatch [:ui-state/set [:end-text] text])
+                                       (dispatch [:db/save]))}]
+
+        ;; TODO input validation
+        ;; setup https://github.com/clj-time/clj-time
+        ;; use JS plugins https://github.com/xgfe/react-native-datepicker https://www.npmjs.com/package/react-native-date-time-picker
+
+      [view {:style {:height 200 :width 350 :padding 20}}
+      [scroll-view {:style {:flex 1}}
+       (for [row @white-list]
+          [view {:key row}
+           [text {:style {:font-size 18 :font-weight "600" :margin-top 10}} (core/format-whitelist-row row)]
+           [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                              :on-press #(do
+                                           (dispatch [:remove-from-whitelist (first row)])
+                                           (dispatch [:db/save]))}
+            [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Remove"]]
+           ])]]
+       ])))
+
 
 (defn invalid-mode []
   [view {:style {:flex-direction "column" :align-items "center"}}
@@ -132,26 +209,25 @@
                         :on-press #(do
                                      (dispatch [:ui-mode-set [:current-mode] :schedules])
                                      (dispatch [:db/save]))}
-     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Set Schedule"]]])
+     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Set Schedule"]]
+    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                             :on-press #(do
+                                          (dispatch [:db/reset])
+                                          (dispatch [:db/save]))}
+     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])
 
 (defn app-root []
   (let [stage (subscribe [:stage])
         mode (subscribe [:ui-mode/get])]
     (fn []
       [view {:style {:flex-direction "column" :margin 40 :align-items "center"}}
-       [text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
-       [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
+       ;;[text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
+       ;;[text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
 
-       ;;[text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} @mode]
        (case @mode
          :stages [show-stage @stage]
          :schedules [set-schedule]
          [invalid-mode])
-       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                             :on-press #(do
-                                          (dispatch [:db/reset])
-                                          (dispatch [:db/save]))}
-        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]
        ])))
 
 

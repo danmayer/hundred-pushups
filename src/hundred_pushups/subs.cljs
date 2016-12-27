@@ -33,6 +33,11 @@
      :schedules :schedules)))
 
 (reg-sub
+ :schedule/get-whitelist
+ (fn [db _]
+   (get-in (:schedules db) [:white-list])))
+
+(reg-sub
  :db
  (fn [db _]
    db))
