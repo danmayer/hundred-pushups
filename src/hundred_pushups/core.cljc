@@ -76,15 +76,12 @@
 (s/fdef day->log
         :args (s/cat :day :exr/day
                      :ts :exr/ts))
-;; TODO - not sure forming and unforming is helping at all here
 (defn day->log [day ts]
-  (let [[action circuits] (s/conform :exr/day day)]
-    (case action
-      :do-circuits
-      (repeat (:exr/sets circuits)
-              (assoc (s/unform :exr/suggested-circuit (:exr/suggested-circuit circuits))
-                     :exr/ts ts))
-      :do-test [])))
+  (if (= day :exr/do-test)
+    []
+    (repeat (:exr/sets day)
+            (assoc (:exr/suggested-circuit day)
+                   :exr/ts ts))))
 
 (defn but-last-day [circuit-log]
   (->> circuit-log
