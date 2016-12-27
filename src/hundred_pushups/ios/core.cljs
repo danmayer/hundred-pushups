@@ -101,7 +101,7 @@
    [text {} @(subscribe [:ui-state/get])]
    [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Today's exercise"]
    (let [schedule @(subscribe [:days-exercise])
-         circuit (:exr/circuit schedule)]
+         circuit (:exr/completed-circuit schedule)]
      [view {:style {:height 350 :width 250 :padding 20 :background-color "lightgrey"}}
       [scroll-view {:style {:flex 1}}
        (for [x (range (:exr/sets schedule))]

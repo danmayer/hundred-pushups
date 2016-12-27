@@ -20,24 +20,23 @@
 (s/def :exr/sets (s/int-in 4 20))
 (s/def :exr/ts inst?)
 
-(s/def :exr/circuit
+(s/def :exr/completed-circuit
   (s/keys :req [:exr/pushup-reps :exr/plank-reps :exr/ts]))
-(s/def :exr/circuit-wo-ts
-  (s/keys :req [:exr/pushup-reps :exr/plank-reps]
-          :opt [:exr/ts]))
-(s/def :exr/test :exr/circuit)
+(s/def :exr/suggested-circuit
+  (s/keys :req [:exr/pushup-reps :exr/plank-reps]))
+(s/def :exr/completed-test
+  (s/keys :req [:exr/pushup-reps :exr/plank-reps :exr/ts]))
 
-;; TODO - revisit the distinction between circuits and circuits without ts
-(s/def :exr/circuits (s/keys :req [:exr/sets :exr/circuits]))
-(s/def :exr/circuits-wo-ts (s/keys :req [:exr/sets :exr/circuit-wo-ts]))
+(s/def :exr/completed-circuits (s/keys :req [:exr/sets :exr/completed-circuits]))
+(s/def :exr/suggested-circuits (s/keys :req [:exr/sets :exr/suggested-circuit]))
 
 (s/def :exr/day
   (s/or
-   :do-circuits :exr/circuits-wo-ts
+   :do-circuits :exr/suggested-circuits
    :do-test #{:exr/do-test}))
 
-(s/def :exr/circuit-log (s/coll-of :exr/circuit))
-(s/def :exr/test-log (s/coll-of :exr/test))
+(s/def :exr/completed-circuit-log (s/coll-of :exr/completed-circuit))
+(s/def :exr/completed-test-log (s/coll-of :exr/test))
 
 ;;;;;; private ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -83,7 +82,7 @@
     (case action
       :do-circuits
       (repeat (:exr/sets circuits)
-              (assoc (s/unform :exr/circuit-wo-ts (:exr/circuit-wo-ts circuits))
+              (assoc (s/unform :exr/suggested-circuit (:exr/suggested-circuit circuits))
                      :exr/ts ts))
       :do-test [])))
 
@@ -110,37 +109,37 @@
 
 (s/fdef suggested-day
         :args (s/cat
-               :test-log (s/and :exr/test-log
-                                (fn [x] (pos? (count x))))
-               :circuit-log :exr/circuit-log)
+               :completed-test-log (s/and :exr/completed-test-log
+                                          (fn [x] (pos? (count x))))
+               :circuit-log :exr/completed-circuit-log)
         :ret :exr/day)
-(defn suggested-day [test-log circuit-log]
+(defn suggested-day [completed-test-log circuit-log]
   (let [reps [:exr/pushup-reps :exr/plank-reps]
         last-circuit (select-keys (last circuit-log) reps)
-        last-test (select-keys (last test-log) reps)]
+        last-test (select-keys (last completed-test-log) reps)]
     (cond
       (empty? last-test)
       :exr/do-test
 
       (empty? last-circuit)
       {:exr/sets 4
-       :exr/circuit-wo-ts (map-vals half last-test)}
+       :exr/suggested-circuit (map-vals half last-test)}
 
       (completed-circuit?
-         (suggested-day test-log (but-last-day circuit-log))
-         circuit-log)
+       (suggested-day completed-test-log (but-last-day circuit-log))
+       circuit-log)
       {:exr/sets 4
-       :exr/circuit-wo-ts (map-vals inc last-circuit)}
+       :exr/suggested-circuit (map-vals inc last-circuit)}
 
       :else
       :exr/do-test)))
 
 (s/fdef complete-day
         :args (s/cat
-               :circuit-log :exr/circuit-log
+               :circuit-log :exr/completed-circuit-log
                :day :exr/day
                :ts :exr/ts)
-        :ret :exr/circuit-log)
+        :ret :exr/completed-circuit-log)
 (defn complete-day [circuit-log day ts]
   (into circuit-log
         (day->log day ts)))

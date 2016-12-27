@@ -24,7 +24,7 @@
 
 (deftest suggesting-sets-and-reps
   (testing "suggests 4 x 50% reps (rounding up) after initial test"
-    (is (= {:exr/circuit-wo-ts
+    (is (= {:exr/suggested-circuit
             {:exr/pushup-reps 5 :exr/plank-reps 8}
             :exr/sets 4}
            (suggested-day
@@ -35,7 +35,7 @@
 
   (testing "suggests 4 x 50% + 1 after one day"
     (let [ts #inst "2016-01-01"]
-      (is (= {:exr/circuit-wo-ts
+      (is (= {:exr/suggested-circuit
               {:exr/pushup-reps 6 :exr/plank-reps 9}
               :exr/sets 4}
              (let [test-log [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts dummy-ts}]
@@ -46,7 +46,7 @@
 
   (testing "suggests 4 x 50% + 2 after two day"
     (let [ts #inst "2016-01-01"]
-      (is (= {:exr/circuit-wo-ts
+      (is (= {:exr/suggested-circuit
               {:exr/pushup-reps 7 :exr/plank-reps 10}
               :exr/sets 4}
              (let [test-log [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts dummy-ts}]
@@ -68,7 +68,7 @@
      [[test-log circuit-log] (s/gen args-sp)]
      (let [day (suggested-day test-log circuit-log)]
        (when-not (= :exr/do-test day)
-         (let [new-circ (:exr/circuit day)
+         (let [new-circ (:exr/completed-circuit day)
                last-circuit (last circuit-log)]
            (when (and new-circ last-circuit)
              (is (<= (:exr/pushup-reps last-circuit) (:exr/pushup-reps new-circ)))
@@ -126,13 +126,13 @@
 (deftest completed-circuit?-test
   (testing "returns false if completed too few sets"
     (is (= false
-           (completed-circuit? {:exr/circuit-wo-ts
+           (completed-circuit? {:exr/suggested-circuit
                                 {:exr/pushup-reps 5 :exr/plank-reps 5}
                                 :exr/sets 4}
                                []))))
   (testing "returns false if there are too few reps in any set"
     (is (= false
-           (completed-circuit? {:exr/circuit-wo-ts
+           (completed-circuit? {:exr/suggested-circuit
                                 {:exr/pushup-reps 5 :exr/plank-reps 5}
                                 :exr/sets 4}
                                [{:exr/pushup-reps 4 :exr/plank-reps 5}
@@ -140,7 +140,7 @@
                                 {:exr/pushup-reps 4 :exr/plank-reps 5}
                                 {:exr/pushup-reps 5 :exr/plank-reps 5}])))
     (is (= false
-           (completed-circuit? {:exr/circuit-wo-ts
+           (completed-circuit? {:exr/suggested-circuit
                                 {:exr/pushup-reps 5 :exr/plank-reps 5}
                                 :exr/sets 4}
                                [{:exr/pushup-reps 5 :exr/plank-reps 5}
@@ -149,7 +149,7 @@
                                 {:exr/pushup-reps 5 :exr/plank-reps 3}]))))
   (testing "returns true if completed all reps in all sets"
     (is (= true
-           (completed-circuit? {:exr/circuit-wo-ts
+           (completed-circuit? {:exr/suggested-circuit
                                 {:exr/pushup-reps 1 :exr/plank-reps 1}
                                 :exr/sets 4}
                                [{:exr/pushup-reps 1 :exr/plank-reps 1}
@@ -157,7 +157,7 @@
                                 {:exr/pushup-reps 1 :exr/plank-reps 1}
                                 {:exr/pushup-reps 1 :exr/plank-reps 1}])))
     (is (= true
-           (completed-circuit? {:exr/circuit-wo-ts
+           (completed-circuit? {:exr/suggested-circuit
                                 {:exr/pushup-reps 1 :exr/plank-reps 1}
                                 :exr/sets 4}
                                [{:exr/pushup-reps 1 :exr/plank-reps 1}
@@ -168,7 +168,7 @@
                                 {:exr/pushup-reps 1 :exr/plank-reps 1}]))))
   (testing "returns true if completed extra reps"
     (is (= true
-           (completed-circuit? {:exr/circuit-wo-ts
+           (completed-circuit? {:exr/suggested-circuit
                                 {:exr/pushup-reps 1 :exr/plank-reps 1}
                                 :exr/sets 4}
                                [{:exr/pushup-reps 1 :exr/plank-reps 1}

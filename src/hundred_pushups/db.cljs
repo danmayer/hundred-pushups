@@ -10,7 +10,7 @@
   (s/keys :req-un [::completed-stages
                    ::ui-state
                    :exr/test-log
-                   :exr/circuit-log]))
+                   :exr/completed-circuit-log]))
 
 ;; initial state of app-db
 (def default-db {:completed-stages []
