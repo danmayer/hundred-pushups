@@ -7,6 +7,10 @@
 
 (use-fixtures :once instrument-all check-asserts)
 
+(defn complete-day [circuit-log day ts]
+  (into circuit-log
+        (day->log day ts)))
+
 (defn complete-next-day [ts test-log log]
   (let [next-day (suggested-day test-log log)]
     (complete-day log next-day ts)))
@@ -82,14 +86,6 @@
            (when (and new-circ last-circuit)
              (is (<= (:exr/pushup-reps last-circuit) (:exr/pushup-reps new-circ)))
              (is (<= (:exr/plank-reps last-circuit) (:exr/plank-reps new-circ))))))))))
-
-(deftest complete-day-spec
-  (let [{args-sp :args ret-sp :ret} (s/get-spec #'complete-day)]
-    (checking
-     "conforms to spec"
-     20
-     [args (s/gen args-sp)]
-     (is (conforms-to? ret-sp (apply complete-day args))))))
 
 (deftest local-date-test
   (testing "returns date based on timezone"

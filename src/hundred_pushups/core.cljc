@@ -150,17 +150,6 @@
       :else
       :exr/do-test)))
 
-;; TODO - do we need this anymore?
-(s/fdef complete-day
-        :args (s/cat
-               :circuit-log :exr/completed-circuit-log
-               :day :exr/day
-               :ts :exr/ts)
-        :ret :exr/completed-circuit-log)
-(defn complete-day [circuit-log day ts]
-  (into circuit-log
-        (day->log day ts)))
-
 (defn ui-state->path [ui-state]
   (concat
    (for [[k v]  (into [] (:pushup-reps-text ui-state))]
