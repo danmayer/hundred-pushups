@@ -157,7 +157,6 @@
      (for [[k v]  (into [] (:plank-reps-text ui-state))]
        [[k :exr/plank-reps] v] )))
 
-;; TODO - rename to circuit?
 (defn merge-day-changes [day ui-state ts]
   (reduce
    (fn [log [path v]]
