@@ -58,8 +58,17 @@
 
   (testing "suggests a test if previous workout was less than suggested"
     (is (= :exr/do-test
-           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts (now)}]
-                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (now)}]))))
+           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts (ts 0)}]
+                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (ts 1)}]))))
+
+  (testing "suggests reps if previous workout was less than suggested previously, but
+            a more recent test has been completed"
+    (is (= {:exr/suggested-circuit
+            {:exr/pushup-reps 5 :exr/plank-reps 6}
+              :exr/sets 4}
+           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (ts 0)}
+                           {:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (ts 2)}]
+                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (ts 1)}]))))
 
   (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day)]
     (checking
@@ -175,3 +184,30 @@
                                 {:exr/pushup-reps 1 :exr/plank-reps 1}
                                 {:exr/pushup-reps 1 :exr/plank-reps 1}
                                 {:exr/pushup-reps 1 :exr/plank-reps 2}])))))
+
+(deftest parse-int-test
+  (is (= 1 (parse-int "1")))
+  (is (= 11 (parse-int "11"))))
+
+(deftest merge-day-changes-test
+  (is (= [{:exr/pushup-reps 1 :exr/plank-reps 1 :exr/ts dummy-ts}
+          {:exr/pushup-reps 1 :exr/plank-reps 1 :exr/ts dummy-ts}
+          {:exr/pushup-reps 1 :exr/plank-reps 1 :exr/ts dummy-ts}
+          {:exr/pushup-reps 1 :exr/plank-reps 1 :exr/ts dummy-ts}]
+         (merge-day-changes {:exr/suggested-circuit
+                             {:exr/pushup-reps 1 :exr/plank-reps 1}
+                             :exr/sets 4}
+                            {:pushup-reps-text {}
+                             :plank-reps-text {}}
+                            dummy-ts)))
+
+  (is (= [{:exr/pushup-reps 1 :exr/plank-reps 0 :exr/ts dummy-ts}
+          {:exr/pushup-reps 1 :exr/plank-reps 1 :exr/ts dummy-ts}
+          {:exr/pushup-reps 1 :exr/plank-reps 1 :exr/ts dummy-ts}
+          {:exr/pushup-reps 1 :exr/plank-reps 1 :exr/ts dummy-ts}]
+         (merge-day-changes {:exr/suggested-circuit
+                             {:exr/pushup-reps 1 :exr/plank-reps 1}
+                             :exr/sets 4}
+                            {:pushup-reps-text {}
+                             :plank-reps-text {0 "0"}}
+                            dummy-ts))))

@@ -96,15 +96,14 @@
    [text {} "DB is:"]
    [text {:style {:font-family "Menlo"}} (pp/write @(subscribe [:db]) :stream nil)]])
 
-(defn show-day []
+(defn show-day [day]
   [view {:style {:flex-direction "column" :align-items "center"}}
-   [text {} @(subscribe [:ui-state/get])]
    [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Today's exercise"]
-   (let [schedule @(subscribe [:days-exercise])
-         circuit (:exr/completed-circuit schedule)]
+   (let [circuit (:exr/suggested-circuit day)
+         ui-state @(subscribe [:ui-state/get])]
      [view {:style {:height 350 :width 250 :padding 20 :background-color "lightgrey"}}
       [scroll-view {:style {:flex 1}}
-       (for [x (range (:exr/sets schedule))]
+       (for [x (range (:exr/sets day))]
          [view {:key x}
           [text {:style {:font-size 18 :font-weight "600" :margin-top 10}} (str "Set" x)]
           [text {} (str (:exr/pushup-reps circuit) " pushups")]
@@ -123,7 +122,7 @@
                                          (dispatch [:db/save]))}]])]
       [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                             :on-press #(do
-                                         (dispatch [:complete-day schedule])
+                                         (dispatch [:complete-day day ui-state])
                                          (dispatch [:db/save]))}
        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Done!"]]]
      )])
@@ -139,16 +138,17 @@
          :learn-pushup-form [learn-pushup-form]
          :do-pushup-test [do-pushup-test]
          :do-plank-test [do-plank-test]
-         :show-day [show-day]
+         :show-day (let [day @(subscribe [:days-exercise])]
+                     (prn "day ------------" day)
+                     (if (= day :exr/do-test)
+                       [do-pushup-test]
+                       [show-day day]))
          [invalid-stage])
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                              :on-press #(do
                                           (dispatch [:db/reset])
                                           (dispatch [:db/save]))}
-        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]
-       ])))
-
-
+        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])))
 
 (defn init []
   (dispatch-sync [:boot/init])

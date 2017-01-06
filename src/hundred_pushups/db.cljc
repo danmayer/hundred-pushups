@@ -9,11 +9,11 @@
 (s/def ::app-db
   (s/keys :req-un [::completed-stages
                    ::ui-state
-                   :exr/test-log
+                   :exr/completed-test-log
                    :exr/completed-circuit-log]))
 
 ;; initial state of app-db
 (def default-db {:completed-stages []
                  :ui-state {}
-                 :test-log []
+                 :completed-test-log []
                  :completed-circuit-log []})

@@ -113,26 +113,26 @@
 
 (reg-event-fx
  :db/load.ok
- validate-spec
+ [validate-spec rn-debug]
  (fn [_world [_event-name db-from-local-storage]]
    {:dispatch [:db/init.ok]
     :db (or db-from-local-storage default-db)}))
 
 (reg-event-db
  :db/init.ok
- validate-spec
+ [validate-spec rn-debug]
  (fn [db [_event]]
    db))
 
 (reg-event-db
  :db/reset
- validate-spec
+ [validate-spec rn-debug]
  (fn [_db [_event]]
    db/default-db))
 
 (reg-event-db
  :complete-stage
- validate-spec
+ [validate-spec rn-debug]
  (fn [db [_event-name stage]]
    (update db :completed-stages conj stage)))
 
@@ -169,8 +169,7 @@
 
 (defn dbg [l x]
   (prn l x)
-  x
-  )
+  x)
 
 (reg-event-db
  :ui-state/clear
@@ -184,12 +183,12 @@
 
 (reg-event-db
  :append-test
- validate-spec
+ [validate-spec rn-debug]
   (fn [db [_event-name test-circuit]]
-    (update db :test-log conj test-circuit)))
+    (update db :completed-test-log conj (assoc test-circuit :exr/ts (core/now)))))
 
 (reg-event-db
  :complete-day
- validate-spec
- (fn [db [_event-name day-schedule]]
-   (update db :circuit-log core/complete-day day-schedule (core/now))))
+ [validate-spec rn-debug]
+ (fn [db [_event-name circuit ui-state]]
+   (update db :completed-circuit-log into (core/merge-day-changes circuit ui-state (core/now)))))

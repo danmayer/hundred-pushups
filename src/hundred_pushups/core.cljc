@@ -36,14 +36,21 @@
    :do-test #{:exr/do-test}))
 
 (s/def :exr/completed-circuit-log (s/coll-of :exr/completed-circuit))
-(s/def :exr/completed-test-log (s/coll-of :exr/test))
+(s/def :exr/completed-test-log (s/coll-of :exr/completed-test))
 
 ;;;;;; private ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn parse-int [x]
+  #?(:clj  (Integer/parseInt x)
+     :cljs (js/parseInt x)))
 
 (defn now []
   (time.coerce/to-date (time/now)))
 
-(def dummy-ts (time.coerce/to-date 0))
+(defn ts [second-since-epoch]
+  (time.coerce/to-date second-since-epoch))
+
+(def dummy-ts (ts 0))
 
 (defn local-date [inst]
   (let [dt (time.coerce/from-date inst)
@@ -102,6 +109,14 @@
      (every? true? (map complete? expected-log actual-log))
      (<= (count expected-log) (count actual-log)))))
 
+(defn ts-greater? [ts1 ts2]
+  ;; <= works for instants in CLJS, but not CLJ
+  (neg? (compare ts1 ts2)))
+
+(defn dbg [l x ]
+  (prn l x)
+  x)
+
 ;;;;;; public ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (s/fdef suggested-day
@@ -112,25 +127,30 @@
         :ret :exr/day)
 (defn suggested-day [completed-test-log circuit-log]
   (let [reps [:exr/pushup-reps :exr/plank-reps]
-        last-circuit (select-keys (last circuit-log) reps)
-        last-test (select-keys (last completed-test-log) reps)]
+        last-circuit (last circuit-log) #_(select-keys (last circuit-log) reps)
+        last-test (last completed-test-log) #_(select-keys (last completed-test-log) reps)]
     (cond
-      (empty? last-test)
+      (nil? last-test)
       :exr/do-test
 
-      (empty? last-circuit)
+      (nil? last-circuit)
       {:exr/sets 4
-       :exr/suggested-circuit (map-vals half last-test)}
+       :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
+
+      (ts-greater? (:exr/ts last-circuit (ts 0)) (:exr/ts last-test))
+      {:exr/sets 4
+       :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
 
       (completed-circuit?
        (suggested-day completed-test-log (but-last-day circuit-log))
        circuit-log)
       {:exr/sets 4
-       :exr/suggested-circuit (map-vals inc last-circuit)}
+       :exr/suggested-circuit (map-vals inc (dissoc last-circuit :exr/ts))}
 
       :else
       :exr/do-test)))
 
+;; TODO - do we need this anymore?
 (s/fdef complete-day
         :args (s/cat
                :circuit-log :exr/completed-circuit-log
@@ -140,3 +160,21 @@
 (defn complete-day [circuit-log day ts]
   (into circuit-log
         (day->log day ts)))
+
+(defn ui-state->path [ui-state]
+  (concat
+   (for [[k v]  (into [] (:pushup-reps-text ui-state))]
+     [[k :exr/pushup-reps] v])
+     (for [[k v]  (into [] (:plank-reps-text ui-state))]
+       [[k :exr/plank-reps] v] )))
+
+;; TODO - rename to circuit?
+(defn merge-day-changes [day ui-state ts]
+  (reduce
+   (fn [log [path v]]
+     (assoc-in
+      log
+      path
+      (parse-int v)))
+   (vec (day->log day ts))
+   (ui-state->path ui-state)))
