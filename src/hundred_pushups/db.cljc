@@ -18,7 +18,8 @@
 
 ;; initial state of app-db
 (def default-db {:completed-stages []
-                 :ui-state {:schedule-day-text "monday"}
+                 :ui-state {:schedule-day-text "monday"
+                            :tabs/selected :workout}
                  :schedules {:white-list {:monday ["9am" "5pm"]
                                           :tuesday ["9am" "5pm"]}
                              :black-list []}
