@@ -45,5 +45,5 @@
 (reg-sub
  :days-exercise
  (fn [db _]
-   (core/suggested-day (:test-log db)
-                       (:circuit-log db))))
+   (core/suggested-day (:completed-test-log db)
+                       (:completed-circuit-log db))))

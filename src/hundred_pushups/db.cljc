@@ -11,16 +11,18 @@
 (s/def ::app-db
   (s/keys :req-un [::completed-stages
                    ::ui-state
+                   :exr/completed-test-log
+                   :exr/completed-circuit-log
                    ::ui-mode
-                   ::schedules
-                   :exr/test-log
-                   :exr/circuit-log]))
+                   ::schedules]))
 
 ;; initial state of app-db
 (def default-db {:completed-stages []
                  :ui-state {:schedule-day-text "monday"}
                  :schedules {:white-list {:monday ["9am" "5pm"]
-                                          :tuesday ["9am" "5pm"]} :black-list []}
+                                          :tuesday ["9am" "5pm"]}
+                             :black-list []}
                  :test-log []
-                 :circuit-log []
+                 :completed-test-log []
+                 :completed-circuit-log []
                  :ui-mode {}})
