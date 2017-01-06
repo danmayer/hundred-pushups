@@ -147,7 +147,6 @@
          :do-pushup-test [do-pushup-test]
          :do-plank-test [do-plank-test]
          :show-day (let [day @(subscribe [:days-exercise])]
-                     (prn "day ------------" day)
                      (if (= day :exr/do-test)
                        [do-pushup-test]
                        [show-day day]))
