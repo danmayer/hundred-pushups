@@ -43,18 +43,26 @@
 
 ;; http://www.100pushups.com/max-pushups-test/
 (defn do-pushup-test []
-  (let [ui-state (subscribe [:ui-state/get])]
+  (let [ui-state (subscribe [:ui-state/get])
+        error-message (atom nil)]
     (fn []
       [view {}
        [text {:style {:text-align "center"}} "Do as many good pushups as you can."]
        [text {:style {:text-align "center"}} "Stop when it takes more than five seconds to do a rep or when you can't do any more reps."]
+       (when @error-message
+         [text {:style {:background-color "pink"}}
+          @error-message])
        [text {} "Reps:"]
        [text-input {:style {:height 40 :border-color "grey" :border-width 1}
                     :default-value (:pushup-reps-text @ui-state)
                     :keyboard-type "numeric"
                     :on-change-text (fn [text]
-                                 (dispatch [:ui-state/set [:pushup-reps-text] text])
-                                      (dispatch [:db/save]))}]
+                                      (if (re-find #"^\d*$" text)
+                                        (do
+                                          (reset! error-message nil)
+                                          (dispatch [:ui-state/set [:pushup-reps-text] text])
+                                          (dispatch [:db/save]))
+                                        (reset! error-message "Must be a valid number")))}]
        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin 10}
                              :on-press #(do
                                           (dispatch [:complete-stage :do-pushup-test])

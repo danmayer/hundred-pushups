@@ -207,3 +207,7 @@
                             {:pushup-reps-text {}
                              :plank-reps-text {0 "0"}}
                             dummy-ts))))
+
+(deftest format-whitelist-row-test
+  (is (= "Monday: 9AM-5PM", (format-whitelist-row ["Monday" ["9AM" "5PM"]])))
+  (is (= "Monday: 9AM-5PM", (format-whitelist-row [:Monday ["9AM" "5PM"]]))))

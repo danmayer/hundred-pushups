@@ -7,8 +7,7 @@
                [clj-time.core :as time]]
         :cljs [[cljs-time.coerce :as time.coerce]
                [cljs-time.core :as time]
-               [cljs-time.format :as time.format]]))
-  )
+               [cljs-time.format :as time.format]])))
 
 ;;;;;; specs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -154,8 +153,8 @@
   (concat
    (for [[k v]  (into [] (:pushup-reps-text ui-state))]
      [[k :exr/pushup-reps] v])
-     (for [[k v]  (into [] (:plank-reps-text ui-state))]
-       [[k :exr/plank-reps] v] )))
+   (for [[k v]  (into [] (:plank-reps-text ui-state))]
+     [[k :exr/plank-reps] v] )))
 
 (defn merge-day-changes [day ui-state ts]
   (reduce
@@ -166,3 +165,6 @@
       (parse-int v)))
    (vec (day->log day ts))
    (ui-state->path ui-state)))
+
+(defn format-whitelist-row [row]
+  (str (name(first row)) ": " (clojure.string/join "-" (last row))))

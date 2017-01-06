@@ -162,6 +162,12 @@
    {:db/save {:db db}}))
 
 (reg-event-db
+ :ui-mode-set
+  validate-spec
+ (fn [db [_event-name path val]]
+   (update db :ui-mode #(assoc-in % path val))))
+
+(reg-event-db
  :ui-state/set
  [validate-spec rn-debug]
  (fn [db [_event-name path val]]
@@ -192,3 +198,15 @@
  [validate-spec rn-debug]
  (fn [db [_event-name circuit ui-state]]
    (update db :completed-circuit-log into (core/merge-day-changes circuit ui-state (core/now)))))
+
+(reg-event-db
+ :save-white-list
+ validate-spec
+ (fn [db [_event-name day start end]]
+   (update db :schedules #(assoc-in % [:white-list (keyword day)] [start end]))))
+
+(reg-event-db
+ :remove-from-whitelist
+ validate-spec
+ (fn [db [_event-name day]]
+   (update db :schedules #(dissoc-in % [:white-list (keyword day)]))))
