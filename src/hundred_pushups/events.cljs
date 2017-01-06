@@ -201,12 +201,17 @@
 
 (reg-event-db
  :save-white-list
- validate-spec
+ [validate-spec rn-debug]
  (fn [db [_event-name day start end]]
    (update db :schedules #(assoc-in % [:white-list (keyword day)] [start end]))))
 
 (reg-event-db
  :remove-from-whitelist
- validate-spec
+ [validate-spec rn-debug]
  (fn [db [_event-name day]]
    (update db :schedules #(dissoc-in % [:white-list (keyword day)]))))
+
+(reg-event-db
+ :select-tab
+ (fn [db [_event-name tab-name]]
+   (assoc db :selected-tab tab-name)))

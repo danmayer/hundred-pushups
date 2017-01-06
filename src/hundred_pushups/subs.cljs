@@ -47,3 +47,8 @@
  (fn [db _]
    (core/suggested-day (:completed-test-log db)
                        (:completed-circuit-log db))))
+
+(reg-sub
+ :selected-tab
+ (fn [db _]
+   (:selected-tab db)))
