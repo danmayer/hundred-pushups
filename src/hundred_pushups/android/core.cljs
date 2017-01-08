@@ -7,6 +7,9 @@
             [hundred-pushups.core :as core]))
 
 (def ReactNative (js/require "react-native"))
+;; From https://github.com/skv-headless/react-native-scrollable-tab-view
+;; We can replace with another nativation library at some future point
+(def ScrollableTabView (js/require "react-native-scrollable-tab-view"))
 
 (def app-registry (.-AppRegistry ReactNative))
 (def linking (.-Linking ReactNative))
