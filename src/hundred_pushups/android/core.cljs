@@ -119,10 +119,11 @@
         white-list (subscribe [:schedule/get-whitelist])]
     (fn []
       [view
+       {:style {:flex 1}}
         ;;[text {} @ui-state]
         ;;[text {} white-list]
 
-        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]
+        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule!!"]
 
         (when-not (nil? (:schedule-error @ui-state))
           [text {:style {:color "red" :text-align "center" :font-weight "bold"}} (:schedule-error @ui-state)])
@@ -177,18 +178,16 @@
         ;; setup https://github.com/clj-time/clj-time
         ;; use JS plugins https://github.com/xgfe/react-native-datepicker https://www.npmjs.com/package/react-native-date-time-picker
 
-      [view {:style {:height 200 :width 350 :padding 20}}
-      [scroll-view {:style {:flex 1}}
-       (for [row @white-list]
+      [view {:style {:flex 1 :padding 20}}
+       [scroll-view {:style {:flex 1}}
+        (for [row @white-list]
           [view {:key row}
            [text {:style {:font-size 18 :font-weight "600" :margin-top 10}} (core/format-whitelist-row row)]
            [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                              :on-press #(do
-                                           (dispatch [:remove-from-whitelist (first row)])
-                                           (dispatch [:db/save]))}
-            [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Remove"]]
-           ])]]
-       ])))
+                                 :on-press #(do
+                                              (dispatch [:remove-from-whitelist (first row)])
+                                              (dispatch [:db/save]))}
+            [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Remove"]]])]]])))
 
 
 (defn invalid-mode []
@@ -220,10 +219,9 @@
   (let [stage (subscribe [:stage])
         mode (subscribe [:ui-mode/get])]
     (fn []
-      [view {:style {:flex-direction "column" :margin 40 :align-items "center"}}
+      [view {:style {:flex-direction "column" :margin 40 :align-items "center" :flex 1}}
        ;;[text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
        ;;[text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
-
        (case @mode
          :stages [show-stage @stage]
          :schedules [set-schedule]
