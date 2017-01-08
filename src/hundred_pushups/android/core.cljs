@@ -177,8 +177,11 @@
         ;; TODO input validation
         ;; setup https://github.com/clj-time/clj-time
         ;; use JS plugins https://github.com/xgfe/react-native-datepicker https://www.npmjs.com/package/react-native-date-time-picker
-
-      [view {:style {:flex 1 :padding 20}}
+       
+       [view {:style {:flex 1 :padding 20}}
+        ;; https://facebook.github.io/react-native/docs/scrollview.html
+        ;; Keep in mind that ScrollViews must have a bounded height in order to work, since they contain unbounded-height children into a bounded container (via a scroll interaction).
+        ;; Forgetting to transfer {flex: 1} down the view stack can lead to errors here, which the element inspector makes easy to debug.
        [scroll-view {:style {:flex 1}}
         (for [row @white-list]
           [view {:key row}
