@@ -156,12 +156,6 @@
                                               (dispatch [:db/save]))
                                              ))}
          [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Save Schedule"]]
-        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                              :on-press #(do
-                                           (dispatch [:ui-mode-set [:current-mode] :stages])
-                                           (dispatch [:db/save]))}
-         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Back"]]
-
 
         [picker {:selected-value (:schedule-day-text @ui-state)
                  :on-value-change (fn [item-data]
@@ -206,11 +200,6 @@
                                               (dispatch [:db/save]))}
             [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Remove"]]])]]])))
 
-
-(defn invalid-mode []
-  [view {:style {:flex-direction "column" :align-items "center"}}
-   [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Bad user, how did you get here."]])
-
 (defn show-stage [stage]
   [view {:style {:flex-direction "column" :align-items "center"}}
     [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} stage]
@@ -228,11 +217,10 @@
      [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])
 
 (defn app-root []
-  (let [stage (subscribe [:stage])
-        mode (subscribe [:ui-mode/get])]
+  (let [stage (subscribe [:stage])]
     (fn []
       [scrollable-tab-view {:style {:margin-top 20 :flex 1}}
-       [scroll-view {:style (:screen styles) :tab-label "config"}
+       [scroll-view {:style (:screen styles) :tab-label "set schedule"}
         [set-schedule]]
        [scroll-view {:style (:screen styles) :tab-label "work out"}
         [show-stage @stage]]
