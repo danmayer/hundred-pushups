@@ -27,6 +27,13 @@
 (def scrollable-tab-view (r/adapt-react-class ScrollableTabView))
 (def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
 
+(def styles
+  {:screen {:flex 1
+            :padding-top 10
+            :padding-right 10
+            :padding-left 10}
+   }
+  )
 
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
@@ -214,24 +221,11 @@
       :do-plank-test [do-plank-test]
       :show-day [show-day]
       [invalid-stage])
-    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                        :on-press #(do
-                                     (dispatch [:ui-mode-set [:current-mode] :schedules])
-                                     (dispatch [:db/save]))}
-     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Set Schedule"]]
-    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                             :on-press #(do
+   [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                         :on-press #(do
                                           (dispatch [:db/reset])
                                           (dispatch [:db/save]))}
      [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])
-
-(def styles
-  {:screen {:flex 1
-            :padding-top 10
-            :padding-right 10
-            :padding-left 10}
-   }
-  )
 
 (defn app-root []
   (let [stage (subscribe [:stage])
