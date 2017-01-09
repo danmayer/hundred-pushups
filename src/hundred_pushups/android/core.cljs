@@ -8,8 +8,11 @@
 
 (def ReactNative (js/require "react-native"))
 ;; From https://github.com/skv-headless/react-native-scrollable-tab-view
-;; We can replace with another nativation library at some future point
-(def ScrollableTabView (js/require "react-native-scrollable-tab-view"))
+;; We can replace with another nativation library at some future point.
+;; The correct incantation for the require can be figured out via the directions
+;; at http://blog.fikesfarm.com/posts/2015-07-24-using-react-native-components-in-clojurescript.html
+;; Note: the React packager is now requiring packages by by internal numerica ID, so this may break in production.
+(def ScrollableTabView (js/require "react-native-scrollable-tab-view/index.js"))
 
 (def app-registry (.-AppRegistry ReactNative))
 (def linking (.-Linking ReactNative))
@@ -21,8 +24,9 @@
 (def image (r/adapt-react-class (.-Image ReactNative)))
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
 (def scroll-view (r/adapt-react-class ReactNative.ScrollView))
-
+(def scrollable-tab-view (r/adapt-react-class ScrollableTabView))
 (def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
+
 
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
@@ -221,20 +225,26 @@
                                           (dispatch [:db/save]))}
      [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])
 
+(def styles
+  {:screen {:flex 1
+            :padding-top 10
+            :padding-right 10
+            :padding-left 10}
+   }
+  )
+
 (defn app-root []
   (let [stage (subscribe [:stage])
         mode (subscribe [:ui-mode/get])]
     (fn []
-      [view {:style {:flex-direction "column" :margin 40 :align-items "center" :flex 1}}
-       ;;[text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
-       ;;[text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
-       (case @mode
-         :stages [show-stage @stage]
-         :schedules [set-schedule]
-         [invalid-mode])
-       ])))
-
-
+      [scrollable-tab-view {:style {:margin-top 20 :flex 1}}
+       [scroll-view {:style (:screen styles) :tab-label "config"}
+        [set-schedule]]
+       [scroll-view {:style (:screen styles) :tab-label "work out"}
+        [show-stage @stage]]
+       [scroll-view {:style (:screen styles) :tab-label "dev"}
+        [text {}
+         "dev menu here"]]])))
 
 (defn init []
   (dispatch-sync [:boot/init])
