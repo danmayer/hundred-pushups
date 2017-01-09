@@ -209,12 +209,15 @@
       :do-pushup-test [do-pushup-test]
       :do-plank-test [do-plank-test]
       :show-day [show-day]
-      [invalid-stage])
+      [invalid-stage])])
+
+(defn dev-menu []
+  [view {}
    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                          :on-press #(do
-                                          (dispatch [:db/reset])
-                                          (dispatch [:db/save]))}
-     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])
+                                      (dispatch [:db/reset])
+                                      (dispatch [:db/save]))}
+    [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset DB"]]])
 
 (defn app-root []
   (let [stage (subscribe [:stage])]
@@ -225,8 +228,7 @@
        [scroll-view {:style (:screen styles) :tab-label "work out"}
         [show-stage @stage]]
        [scroll-view {:style (:screen styles) :tab-label "dev"}
-        [text {}
-         "dev menu here"]]])))
+        [dev-menu]]])))
 
 (defn init []
   (dispatch-sync [:boot/init])

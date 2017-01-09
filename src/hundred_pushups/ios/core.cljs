@@ -164,12 +164,15 @@
                  (if (= day :exr/do-test)
                    [do-pushup-test]
                    [show-day day]))
-     [invalid-stage])
+     [invalid-stage])])
+
+(defn dev-menu []
+  [view {}
    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                          :on-press #(do
                                       (dispatch [:db/reset])
                                       (dispatch [:db/save]))}
-    [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])
+    [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset DB"]]])
 
 (defn app-root []
   ;; TODO - move stage subscription down a bit
@@ -182,8 +185,7 @@
        [scroll-view {:style (:screen styles) :tab-label "work out"}
         [show-stage @stage]]
        [scroll-view {:style (:screen styles) :tab-label "dev"}
-        [text {}
-         "dev menu here"]]])))
+        [dev-menu]]])))
 
 (defn init []
   (dispatch-sync [:boot/init])
