@@ -113,14 +113,22 @@ Or, for both type:
 
 To see log output, run one of the following
 
+
 ```bash
 $ react-native log-ios
 $ react-native log-android
 ```
 
+### Debug menu
+
+iOS: `cmd + ctrl + Z`
+android: `cmd + m`
+
 ## License
 
-Copyright © 2016 Ben Brinckerhoff and Dan Mayer
+####
+
+Copyright © 2017 Ben Brinckerhoff and Dan Mayer
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
