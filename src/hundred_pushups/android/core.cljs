@@ -212,12 +212,17 @@
       [invalid-stage])])
 
 (defn dev-menu []
-  [view {}
+  [view {:style {:flex 1}}
+   [text {} "DB"]
    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
                          :on-press #(do
                                       (dispatch [:db/reset])
                                       (dispatch [:db/save]))}
-    [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset DB"]]])
+    [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset DB"]]
+   [scroll-view {:style {:padding-top 20}}
+    [text {:style {:font-family "Menlo"
+                   :background-color "lightgrey"}}
+     (pp/write @(subscribe [:db]) :stream nil)]]])
 
 (defn app-root []
   (let [stage (subscribe [:stage])]
