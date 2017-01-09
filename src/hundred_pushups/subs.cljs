@@ -25,6 +25,14 @@
    (:ui-state db)))
 
 (reg-sub
+ :ui-mode/get
+ (fn [db _]
+   (case (get-in (:ui-mode db) [:current-mode])
+     nil :stages
+     :stages :stages
+     :schedules :schedules)))
+
+(reg-sub
  :schedule/get-whitelist
  (fn [db _]
    (get-in (:schedules db) [:white-list])))
@@ -39,3 +47,8 @@
  (fn [db _]
    (core/suggested-day (:completed-test-log db)
                        (:completed-circuit-log db))))
+
+(reg-sub
+ :selected-tab
+ (fn [db _]
+   (:selected-tab db)))
