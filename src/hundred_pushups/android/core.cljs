@@ -137,7 +137,7 @@
         ;;[text {} @ui-state]
         ;;[text {} white-list]
 
-        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule!!"]
+        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]
 
         (when-not (nil? (:schedule-error @ui-state))
           [text {:style {:color "red" :text-align "center" :font-weight "bold"}} (:schedule-error @ui-state)])

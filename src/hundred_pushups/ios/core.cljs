@@ -22,9 +22,6 @@
 (def image (r/adapt-react-class (.-Image ReactNative)))
 (def scroll-view (r/adapt-react-class ReactNative.ScrollView))
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
-;; TODO - delete tabbar ios??
-(def tab-bar (r/adapt-react-class ReactNative.TabBarIOS))
-(def tab-bar-item (r/adapt-react-class ReactNative.TabBarIOS.Item))
 (def scrollable-tab-view (r/adapt-react-class ScrollableTabView))
 
 (def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
