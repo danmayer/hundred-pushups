@@ -30,7 +30,7 @@
 (def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
 
 (def styles
-  {:screen {:flex 1
+  {:tab {:flex 1
             :padding-top 10
             :padding-right 10
             :padding-left 10}})
@@ -180,18 +180,29 @@
      (pp/write @(subscribe [:db]) :stream nil)]]])
 
 (defn app-root []
-  ;; TODO - move stage subscription down a bit
-  (let [stage (subscribe [:stage])]
+  ;; We intentionally only deref the selected tab once, when the component mounts.
+  ;; If we updated the component whenever the selected-tab changed, we'd get weird
+  ;; behavior because the scrollable-tab-view is trying to control the tab AND
+  ;; we're trying to set it manually. The following code allows us to update
+  ;; with figwheel without losing our tab position but will also reset to the default
+  ;; tab (set in db.cljs) when we reload the app via React Native.
+  (let [initial-tab @(subscribe [:selected-tab])]
     (fn []
-      [scrollable-tab-view {:style {:margin-top 20 :flex 1}}
-       [scroll-view {:style (:screen styles) :tab-label "schedule"}
+      [scrollable-tab-view {:style {:margin-top 20 :flex 1}
+                            :on-change-tab (fn [evt]
+                                             (do
+                                               (dispatch [:select-tab (get (js->clj evt) "i")])
+                                               (dispatch [:db/save])))
+                            :initial-page initial-tab}
+       [scroll-view {:style (:tab styles) :tab-label "schedule"}
         [text {}
-         "set schedule here"]]
-       [scroll-view {:style (:screen styles) :tab-label "work out"}
-        [show-stage @stage]]
-       [scroll-view {:style (:screen styles) :tab-label "dev"}
+         "set schedule here!!"]]
+       [scroll-view {:style (:tab styles) :tab-label "work out"}
+        [show-stage @(subscribe [:stage])]]
+       [scroll-view {:style (:tab styles) :tab-label "dev"}
         [dev-menu]]])))
 
 (defn init []
+  (dispatch-sync [:db/reset])
   (dispatch-sync [:boot/init])
   (.registerComponent app-registry "HundredPushups" #(r/reactify-component app-root)))

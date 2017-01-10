@@ -1,6 +1,7 @@
 (ns hundred-pushups.subs
   (:require [re-frame.core :refer [reg-sub]]
-            [hundred-pushups.core :as core]))
+            [hundred-pushups.core :as core]
+            [hundred-pushups.db :as db]))
 
 ;; FIXME - delete after android no longer uses this
 (reg-sub
@@ -25,14 +26,6 @@
    (:ui-state db)))
 
 (reg-sub
- :ui-mode/get
- (fn [db _]
-   (case (get-in (:ui-mode db) [:current-mode])
-     nil :stages
-     :stages :stages
-     :schedules :schedules)))
-
-(reg-sub
  :schedule/get-whitelist
  (fn [db _]
    (get-in (:schedules db) [:white-list])))
@@ -51,4 +44,4 @@
 (reg-sub
  :selected-tab
  (fn [db _]
-   (:selected-tab db)))
+   (get hundred-pushups.db/tabs (:selected-tab db))))

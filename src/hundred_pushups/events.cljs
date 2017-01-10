@@ -1,5 +1,6 @@
 (ns hundred-pushups.events
   (:require
+    [clojure.set :as set]
     [cljs.core.async :as async]
     [clojure.data :as data]
     [clojure.spec :as s]
@@ -162,12 +163,6 @@
    {:db/save {:db db}}))
 
 (reg-event-db
- :ui-mode-set
-  validate-spec
- (fn [db [_event-name path val]]
-   (update db :ui-mode #(assoc-in % path val))))
-
-(reg-event-db
  :ui-state/set
  [validate-spec rn-debug]
  (fn [db [_event-name path val]]
@@ -213,5 +208,6 @@
 
 (reg-event-db
  :select-tab
- (fn [db [_event-name tab-name]]
-   (assoc db :selected-tab tab-name)))
+ [validate-spec rn-debug]
+ (fn [db [_event-name idx]]
+   (assoc db :selected-tab (get (set/map-invert db/tabs) idx))))
