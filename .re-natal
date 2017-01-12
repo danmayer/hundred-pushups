@@ -1,13 +1,15 @@
 {
   "name": "HundredPushups",
   "interface": "reagent6",
-  "androidHost": "localhost",
+  "androidHost": "10.0.2.2",
   "iosHost": "localhost",
   "envRoots": {
     "dev": "env/dev",
     "prod": "env/prod"
   },
-  "modules": [],
+  "modules": [
+    "react-native-scrollable-tab-view"
+  ],
   "imageDirs": [
     "images"
   ]

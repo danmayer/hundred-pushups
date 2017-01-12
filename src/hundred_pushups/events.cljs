@@ -1,5 +1,6 @@
 (ns hundred-pushups.events
   (:require
+    [clojure.set :as set]
     [cljs.core.async :as async]
     [clojure.data :as data]
     [clojure.spec :as s]
@@ -162,12 +163,6 @@
    {:db/save {:db db}}))
 
 (reg-event-db
- :ui-mode-set
-  validate-spec
- (fn [db [_event-name path val]]
-   (update db :ui-mode #(assoc-in % path val))))
-
-(reg-event-db
  :ui-state/set
  [validate-spec rn-debug]
  (fn [db [_event-name path val]]
@@ -201,12 +196,18 @@
 
 (reg-event-db
  :save-white-list
- validate-spec
+ [validate-spec rn-debug]
  (fn [db [_event-name day start end]]
    (update db :schedules #(assoc-in % [:white-list (keyword day)] [start end]))))
 
 (reg-event-db
  :remove-from-whitelist
- validate-spec
+ [validate-spec rn-debug]
  (fn [db [_event-name day]]
    (update db :schedules #(dissoc-in % [:white-list (keyword day)]))))
+
+(reg-event-db
+ :select-tab
+ [validate-spec rn-debug]
+ (fn [db [_event-name idx]]
+   (assoc db :selected-tab (get (set/map-invert db/tabs) idx))))

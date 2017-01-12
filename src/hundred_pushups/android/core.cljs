@@ -7,6 +7,12 @@
             [hundred-pushups.core :as core]))
 
 (def ReactNative (js/require "react-native"))
+;; From https://github.com/skv-headless/react-native-scrollable-tab-view
+;; We can replace with another nativation library at some future point.
+;; The correct incantation for the require can be figured out via the directions
+;; at http://blog.fikesfarm.com/posts/2015-07-24-using-react-native-components-in-clojurescript.html
+;; Note: the React packager is now requiring packages by by internal numerica ID, so this may break in production.
+(def ScrollableTabView (js/require "react-native-scrollable-tab-view/index.js"))
 
 (def app-registry (.-AppRegistry ReactNative))
 (def linking (.-Linking ReactNative))
@@ -18,8 +24,16 @@
 (def image (r/adapt-react-class (.-Image ReactNative)))
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
 (def scroll-view (r/adapt-react-class ReactNative.ScrollView))
-
+(def scrollable-tab-view (r/adapt-react-class ScrollableTabView))
 (def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
+
+(def styles
+  {:tab {:flex 1
+            :padding-top 10
+            :padding-right 10
+            :padding-left 10}
+   }
+  )
 
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
@@ -119,6 +133,7 @@
         white-list (subscribe [:schedule/get-whitelist])]
     (fn []
       [view
+       {:style {:flex 1}}
         ;;[text {} @ui-state]
         ;;[text {} white-list]
 
@@ -141,12 +156,6 @@
                                               (dispatch [:db/save]))
                                              ))}
          [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Save Schedule"]]
-        [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                              :on-press #(do
-                                           (dispatch [:ui-mode-set [:current-mode] :stages])
-                                           (dispatch [:db/save]))}
-         [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Back"]]
-
 
         [picker {:selected-value (:schedule-day-text @ui-state)
                  :on-value-change (fn [item-data]
@@ -176,24 +185,21 @@
         ;; TODO input validation
         ;; setup https://github.com/clj-time/clj-time
         ;; use JS plugins https://github.com/xgfe/react-native-datepicker https://www.npmjs.com/package/react-native-date-time-picker
-
-      [view {:style {:height 200 :width 350 :padding 20}}
-      [scroll-view {:style {:flex 1}}
-       (for [row @white-list]
+       
+       [view {:style {:flex 1 :padding 20}}
+        ;; https://facebook.github.io/react-native/docs/scrollview.html
+        ;; Keep in mind that ScrollViews must have a bounded height in order to work, since they contain unbounded-height children into a bounded container (via a scroll interaction).
+        ;; Forgetting to transfer {flex: 1} down the view stack can lead to errors here, which the element inspector makes easy to debug.
+       [scroll-view {:style {:flex 1}}
+        (for [row @white-list]
           [view {:key row}
            [text {:style {:font-size 18 :font-weight "600" :margin-top 10}} (core/format-whitelist-row row)]
            [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                              :on-press #(do
-                                           (dispatch [:remove-from-whitelist (first row)])
-                                           (dispatch [:db/save]))}
-            [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Remove"]]
-           ])]]
-       ])))
+                                 :on-press #(do
+                                              (dispatch [:remove-from-whitelist (first row)])
+                                              (dispatch [:db/save]))}
+            [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Remove"]]])]]])))
 
-
-(defn invalid-mode []
-  [view {:style {:flex-direction "column" :align-items "center"}}
-   [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Bad user, how did you get here."]])
 
 (defn show-stage [stage]
   [view {:style {:flex-direction "column" :align-items "center"}}
@@ -204,34 +210,42 @@
       :do-pushup-test [do-pushup-test]
       :do-plank-test [do-plank-test]
       :show-day [show-day]
-      [invalid-stage])
-    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                        :on-press #(do
-                                     (dispatch [:ui-mode-set [:current-mode] :schedules])
-                                     (dispatch [:db/save]))}
-     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Set Schedule"]]
-    [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
-                             :on-press #(do
-                                          (dispatch [:db/reset])
-                                          (dispatch [:db/save]))}
-     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset"]]])
+      [invalid-stage])])
+
+(defn dev-menu []
+  [view {:style {:flex 1}}
+   [text {} "DB"]
+   [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+                         :on-press #(do
+                                      (dispatch [:db/reset])
+                                      (dispatch [:db/save]))}
+    [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset DB"]]
+   [scroll-view {:style {:padding-top 20}}
+    [text {:style {:font-family "Menlo"
+                   :background-color "lightgrey"}}
+     (pp/write @(subscribe [:db]) :stream nil)]]])
 
 (defn app-root []
-  (let [stage (subscribe [:stage])
-        mode (subscribe [:ui-mode/get])]
+  ;; We intentionally only deref the selected tab once, when the component mounts.
+  ;; If we updated the component whenever the selected-tab changed, we'd get weird
+  ;; behavior because the scrollable-tab-view is trying to control the tab AND
+  ;; we're trying to set it manually. The following code allows us to update
+  ;; with figwheel without losing our tab position but will also reset to the default
+  ;; tab (set in db.cljs) when we reload the app via React Native.
+  (let [initial-tab @(subscribe [:selected-tab])]
     (fn []
-      [view {:style {:flex-direction "column" :margin 40 :align-items "center"}}
-       ;;[text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} "100 Pushup Challenge"]
-       ;;[text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} "Become a pushup master"]
-
-       (case @mode
-         :stages [show-stage @stage]
-         :schedules [set-schedule]
-         [invalid-mode])
-       ])))
-
-
+      [scrollable-tab-view {:style {:margin-top 20 :flex 1}
+                            :on-change-tab (fn [evt]
+                                             (dispatch [:select-tab (get (js->clj evt) "i")]))
+                            :initial-page initial-tab}
+       [scroll-view {:style (:tab styles) :tab-label "schedule"}
+        [set-schedule]]
+       [scroll-view {:style (:tab styles) :tab-label "work out"}
+        [show-stage @(subscribe [:stage])]]
+       [scroll-view {:style (:tab styles) :tab-label "dev"}
+        [dev-menu]]])))
 
 (defn init []
+  (dispatch-sync [:db/reset])
   (dispatch-sync [:boot/init])
   (.registerComponent app-registry "HundredPushups" #(r/reactify-component app-root)))
