@@ -212,11 +212,6 @@
                                               (dispatch [:db/save]))}
             [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Remove"]]])]]])))
 
-
-(defn invalid-mode []
-  [view {:style {:flex-direction "column" :align-items "center"}}
-   [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Bad user, how did you get here."]])
-
 (defn show-stage [stage]
   [view {:style {:flex-direction "column" :align-items "center"}}
     [show-header "100 Pushup Challenge", "Become a pushup master"]
