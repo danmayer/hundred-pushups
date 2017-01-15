@@ -124,6 +124,11 @@ $ react-native log-android
 iOS: `cmd + ctrl + Z`
 android: `cmd + m`
 
+### Todo
+
+* hamburger menu for footer options
+* validation on \d+ AM / PM on adding to schedule
+
 ## License
 
 ####

@@ -136,8 +136,7 @@
        {:style {:flex 1}}
         ;;[text {} @ui-state]
         ;;[text {} white-list]
-
-        [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Create Schedule"]
+        [show-header nil, "Create Schedule"]
 
         (when-not (nil? (:schedule-error @ui-state))
           [text {:style {:color "red" :text-align "center" :font-weight "bold"}} (:schedule-error @ui-state)])
@@ -185,7 +184,7 @@
         ;; TODO input validation
         ;; setup https://github.com/clj-time/clj-time
         ;; use JS plugins https://github.com/xgfe/react-native-datepicker https://www.npmjs.com/package/react-native-date-time-picker
-       
+
        [view {:style {:flex 1 :padding 20}}
         ;; https://facebook.github.io/react-native/docs/scrollview.html
         ;; Keep in mind that ScrollViews must have a bounded height in order to work, since they contain unbounded-height children into a bounded container (via a scroll interaction).
@@ -201,8 +200,20 @@
             [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Remove"]]])]]])))
 
 
+(defn invalid-mode []
+  [view {:style {:flex-direction "column" :align-items "center"}}
+   [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Bad user, how did you get here."]])
+
+(defn show-header [title, sub-title]
+  [view {}
+  (when title
+    [text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} title])
+  [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} sub-title]]
+  )
+
 (defn show-stage [stage]
   [view {:style {:flex-direction "column" :align-items "center"}}
+    [show-header "100 Pushup Challenge", "Become a pushup master"]
     [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} stage]
     (case stage
       :get-started [get-started]
