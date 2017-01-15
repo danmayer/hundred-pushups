@@ -126,8 +126,8 @@ android: `cmd + m`
 
 ### Todo
 
-* hamburger menu for footer options
-* validation on \d+ AM / PM on adding to schedule
+* move time selection to be number + am/pm picker
+* add snooze
 
 ## License
 
