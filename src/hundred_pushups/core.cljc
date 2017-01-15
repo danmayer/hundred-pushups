@@ -2,6 +2,7 @@
   (:require
     [clojure.spec.test :as st]
     [clojure.spec :as s]
+    [clojure.string :as str]
 
     #?@(:clj  [[clj-time.coerce :as time.coerce]
                [clj-time.core :as time]]
@@ -48,6 +49,31 @@
 
 (defn ts [second-since-epoch]
   (time.coerce/to-date second-since-epoch))
+
+;; TODO - does clj-time have time.format ?
+#?(:cljs
+   (do
+     (defn ts-formatter []
+       (:basic-date-time-no-ms time.format/formatters))
+     
+     (defn time-str [ts]
+       (time.format/unparse (ts-formatter) (time/date-time ts)))))
+
+;; Because of course moment.js uses a custom set of parsing tokens
+;; http://momentjs.com/docs/#/parsing/string-format/
+(defn moment-js-format-str [format-str]
+  (prn "format str is " format-str "----------------------------------------")
+  (-> (s/assert some? format-str)
+      (str/replace "yyyy" "YYYY")
+      (str/replace "dd" "DD")))
+
+(comment
+  (map :format-str (vals  time.format/formatters))
+  (sort (keys  time.format/formatters))
+  (:format-str ts-formatter)
+  (time.format/show-formatters)
+  (time-str (now))
+  )
 
 (def dummy-ts (ts 0))
 

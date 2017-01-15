@@ -1,7 +1,9 @@
 (ns hundred-pushups.ios.core
   (:require [reagent.core :as r :refer [atom]]
             [clojure.pprint :as pp]
+            [cljs.spec :as s]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
+            [hundred-pushups.core :as core]
             [hundred-pushups.events]
             [hundred-pushups.subs]))
 
@@ -12,7 +14,7 @@
 ;; at http://blog.fikesfarm.com/posts/2015-07-24-using-react-native-components-in-clojurescript.html
 ;; Note: the React packager is now requiring packages by by internal numerica ID, so this may break in production.
 (def ScrollableTabView (js/require "react-native-scrollable-tab-view/index.js"))
-
+(def DatePicker (.-default (js/require "react-native-datepicker/index.js")))
 
 (def app-registry (.-AppRegistry ReactNative))
 (def linking (.-Linking ReactNative))
@@ -23,6 +25,8 @@
 (def scroll-view (r/adapt-react-class ReactNative.ScrollView))
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
 (def scrollable-tab-view (r/adapt-react-class ScrollableTabView))
+
+(def date-picker (r/adapt-react-class DatePicker))
 
 (def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
 
@@ -174,7 +178,16 @@
    [scroll-view {:style {:padding-top 20}}
     [text {:style {:font-family "Menlo"
                    :background-color "lightgrey"}}
-     (pp/write @(subscribe [:db]) :stream nil)]]])
+     (pp/write @(subscribe [:db]) :stream nil)]]
+   (prn "---------------" (core/time-str (core/now)))
+   (prn "---------------" (:format-str (core/ts-formatter)))
+   [date-picker {:style {:width 300}
+                 :date (s/assert some? (core/time-str (core/now)))
+                 :mode "datetime"
+                 :format (s/assert some? (core/moment-js-format-str (:format-str (core/ts-formatter))))
+                 :confirm-btn-text "OK"
+                 :cancel-btn-text "Cancel"
+                 }]])
 
 (defn app-root []
   ;; We intentionally only deref the selected tab once, when the component mounts.
