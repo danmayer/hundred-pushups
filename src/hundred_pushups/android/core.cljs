@@ -128,6 +128,13 @@
                                          (dispatch [:db/save]))}
        [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "I did it"]]])])
 
+(defn show-header [title, sub-title]
+  [view {}
+  (when title
+    [text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} title])
+  [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} sub-title]]
+  )
+
 (defn set-schedule []
   (let [ui-state (subscribe [:ui-state/get])
         white-list (subscribe [:schedule/get-whitelist])]
@@ -145,11 +152,17 @@
                               :on-press #(do
                                            (if (not-any? nil? [(:schedule-day-text @ui-state) (:start-text @ui-state) (:end-text @ui-state)])
                                              (do
-                                              (dispatch [:save-white-list (:schedule-day-text @ui-state) (:start-text @ui-state) (:end-text @ui-state)])
-                                              (dispatch [:ui-state/set [:schedule-error] nil])
-                                              (dispatch [:ui-state/set [:start-text] nil])
-                                              (dispatch [:ui-state/set [:end-text] nil])
-                                              (dispatch [:db/save]))
+                                              (if (and (core/valid-hour-time (:start-text @ui-state)) (core/valid-hour-time (:end-text @ui-state)))
+                                                (do
+                                                  (dispatch [:save-white-list (:schedule-day-text @ui-state) (:start-text @ui-state) (:end-text @ui-state)])
+                                                  (dispatch [:ui-state/set [:schedule-error] nil])
+                                                  (dispatch [:ui-state/set [:start-text] nil])
+                                                  (dispatch [:ui-state/set [:end-text] nil])
+                                                  (dispatch [:db/save]))
+                                                (do
+                                                  (dispatch [:ui-state/set [:schedule-error] "time format like 9am or 3pm"])
+                                                  (dispatch [:db/save]))
+                                                ))
                                              (do
                                               (dispatch [:ui-state/set [:schedule-error] "fill in all schedule values"])
                                               (dispatch [:db/save]))
@@ -203,13 +216,6 @@
 (defn invalid-mode []
   [view {:style {:flex-direction "column" :align-items "center"}}
    [text {:style {:font-size 20 :font-weight "100" :margin-bottom 10 :text-align "center"}} "Bad user, how did you get here."]])
-
-(defn show-header [title, sub-title]
-  [view {}
-  (when title
-    [text {:style {:font-size 40 :font-weight "100" :margin-bottom 10 :text-align "center"}} title])
-  [text {:style {:font-size 20 :font-weight "100" :margin-bottom 20 :text-align "center"}} sub-title]]
-  )
 
 (defn show-stage [stage]
   [view {:style {:flex-direction "column" :align-items "center"}}

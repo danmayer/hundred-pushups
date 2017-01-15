@@ -168,3 +168,9 @@
 
 (defn format-whitelist-row [row]
   (str (name(first row)) ": " (clojure.string/join "-" (last row))))
+
+(def not-nil? (complement nil?))
+
+(defn valid-hour-time [input]
+  (and (not-nil? input)
+  (not-nil? (re-matches #"\d+(am|pm)" input))))
