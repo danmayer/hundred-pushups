@@ -26,7 +26,10 @@
              :dev {:dependencies [[figwheel-sidecar "0.5.8"]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/test.check "0.9.0"]
-                                  [com.gfredericks/test.chuck "0.2.7"]]
+                                  [com.gfredericks/test.chuck "0.2.7"]
+                                  ;; react-native-datepicker uses
+                                  ;; moment, and we need to convert to/from it
+                                  [cljsjs/moment "2.17.1-0"]]
                    :source-paths ["src" "env/dev"]
                    :cljsbuild    {:builds [{:id           "ios"
                                             :source-paths ["src" "env/dev"]

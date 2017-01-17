@@ -117,7 +117,7 @@
  [validate-spec rn-debug]
  (fn [_world [_event-name db-from-local-storage]]
    {:dispatch [:db/init.ok]
-    :db (or db-from-local-storage default-db)}))
+    :db (merge default-db db-from-local-storage)}))
 
 (reg-event-db
  :db/init.ok
@@ -211,3 +211,16 @@
  [validate-spec rn-debug]
  (fn [db [_event-name idx]]
    (assoc db :selected-tab (get (set/map-invert db/tabs) idx))))
+
+(reg-event-db
+ :timer
+ ;; Don't run debug middleware here, it'll be way too much output
+ validate-spec
+ (fn [db [_event-name new-time]]
+   (assoc db :actual-time new-time)))
+
+(reg-event-db
+ :set-simulated-time
+ [validate-spec rn-debug]
+ (fn [db [_event-name simulated-time]]
+   (assoc db :simulated-time (core/parse-moment-str simulated-time))))

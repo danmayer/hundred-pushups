@@ -5,10 +5,12 @@
     [clojure.string :as str]
 
     #?@(:clj  [[clj-time.coerce :as time.coerce]
-               [clj-time.core :as time]]
+               [clj-time.core :as time]
+               [clj-time.format :as time.format]]
         :cljs [[cljs-time.coerce :as time.coerce]
                [cljs-time.core :as time]
-               [cljs-time.format :as time.format]])))
+               [cljs-time.format :as time.format]
+               [cljsjs.moment :as moment]])))
 
 ;;;;;; specs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -44,36 +46,28 @@
   #?(:clj  (Integer/parseInt x)
      :cljs (js/parseInt x)))
 
+;; TODO - extract time stuff into ts namespace
 (defn now []
   (time.coerce/to-date (time/now)))
 
 (defn ts [second-since-epoch]
   (time.coerce/to-date second-since-epoch))
 
-;; TODO - does clj-time have time.format ?
-#?(:cljs
-   (do
-     (defn ts-formatter []
-       (:basic-date-time-no-ms time.format/formatters))
-     
-     (defn time-str [ts]
-       (time.format/unparse (ts-formatter) (time/date-time ts)))))
+(defn ts-formatter []
+  (:basic-date-time-no-ms time.format/formatters))
+
+(defn time-str [ts]
+  (time.format/unparse (ts-formatter) (time/date-time ts)))
 
 ;; Because of course moment.js uses a custom set of parsing tokens
 ;; http://momentjs.com/docs/#/parsing/string-format/
 (defn moment-js-format-str [format-str]
-  (prn "format str is " format-str "----------------------------------------")
   (-> (s/assert some? format-str)
       (str/replace "yyyy" "YYYY")
       (str/replace "dd" "DD")))
 
-(comment
-  (map :format-str (vals  time.format/formatters))
-  (sort (keys  time.format/formatters))
-  (:format-str ts-formatter)
-  (time.format/show-formatters)
-  (time-str (now))
-  )
+(defn parse-time-str [format-str]
+  (time.format/parse (ts-formatter) format-str))
 
 (def dummy-ts (ts 0))
 
@@ -84,6 +78,18 @@
     [(time/year local-dt)
      (time/month local-dt)
      (time/day local-dt)]))
+
+#?(:cljs
+   (defn parse-moment-str [moment-str]
+     (if-not moment-str
+       nil
+       (let [time-str (-> moment-str
+                          (js/moment (moment-js-format-str (:format-str (ts-formatter))))
+                          (.utc)
+                          (.format (moment-js-format-str (:format-str (ts-formatter))))
+                          (str/replace "+00:00" "Z")
+                          (str/replace "'T'" "T"))]
+         (time.coerce/to-date (time.format/parse (ts-formatter) time-str))))))
 
 (defn div-ceil [num den]
   (let [q (quot num den)
