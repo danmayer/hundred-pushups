@@ -4,7 +4,8 @@
     [clojure.spec :as s]
 
     #?@(:clj  [[clj-time.coerce :as time.coerce]
-               [clj-time.core :as time]]
+               [clj-time.core :as time]
+               [clj-time.format  :as time.format]]
         :cljs [[cljs-time.coerce :as time.coerce]
                [cljs-time.core :as time]
                [cljs-time.format :as time.format]])))
@@ -172,3 +173,17 @@
 (defn valid-hour-time [input]
   (and (some? input)
   (some? (re-matches #"\d+(am|pm)" input))))
+
+(def day-of-formatter (time.format/formatter "ha"))
+
+(defn parse-time [time-string]
+  (time/today-at (time/hour (time.format/parse day-of-formatter time-string)) 00))
+
+(defn day-symbol [day-num]
+  (keyword  (["monday" "tuesday" "wednesday" "thursday" "friday" "saturday" "sunday"] day-num)))
+
+(defn todays-range [whitelist blacklist]
+  (map
+    parse-time
+    (get-in whitelist [(day-symbol (time/day-of-week (time/today)))]))
+  )

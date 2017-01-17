@@ -3,6 +3,7 @@
             [clojure.spec :as s]
             [hundred-pushups.test-helper :refer :all]
             [hundred-pushups.core :refer :all]
+            [clj-time.core :as time]
             [com.gfredericks.test.chuck.clojure-test :refer [checking]]))
 
 (use-fixtures :once instrument-all check-asserts)
@@ -221,3 +222,19 @@
   (is (= false, (and (valid-hour-time "abc") (valid-hour-time "123"))))
   (is (= false, (and (valid-hour-time "abc") (valid-hour-time "5pm"))))
   (is (= true, (and (valid-hour-time "9am") (valid-hour-time "5pm")))))
+
+(deftest parse-time-test
+  (is (= (time/today-at 0 00), (parse-time "12am")))
+  (is (= (time/today-at 9 00), (parse-time "9am")))
+  (is (= (time/today-at 15 00), (parse-time  "3pm")))
+  (is (= (time/today-at 23 00), (parse-time  "11pm"))))
+
+(deftest todays-range-test
+  (is (= [(time/today-at 9 00) (time/today-at 17 00)], (todays-range {:monday ["9am" "5pm"]
+                                                                      :tuesday ["9am" "5pm"]
+                                                                      :wendnesday ["9am" "5pm"]
+                                                                      :thursday ["9am" "5pm"]
+                                                                      :friday ["9am" "5pm"]
+                                                                      :saturday ["9am" "5pm"]
+                                                                      :sunday ["9am" "5pm"]}
+                                                                     []))))
