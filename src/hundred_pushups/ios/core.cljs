@@ -5,7 +5,8 @@
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [hundred-pushups.core :as core]
             [hundred-pushups.events]
-            [hundred-pushups.subs]))
+            [hundred-pushups.subs]
+            [hundred-pushups.datetime :as dt]))
 
 (def ReactNative (js/require "react-native"))
 ;; From https://github.com/skv-headless/react-native-scrollable-tab-view
@@ -42,7 +43,7 @@
    })
 
 (defn dispatch-timer-event []
-  (dispatch [:timer (core/now)]))
+  (dispatch [:timer (dt/now)]))
 
 (defonce do-timer (js/setInterval dispatch-timer-event 1000))
 
@@ -193,11 +194,11 @@
    [text {} (str "Actual time: " @(subscribe [:actual-time]))]
    [text {} (str "Simulated time: ")]
    [date-picker {:style {:width 300}
-                 :date (s/assert some? (core/time-str (or
-                                                       @(subscribe [:simulated-time])
-                                                       @(subscribe [:actual-time]))))
+                 :date (s/assert some? (dt/inst->str (or
+                                                      @(subscribe [:simulated-time])
+                                                      @(subscribe [:actual-time]))))
                  :mode "datetime"
-                 :format (s/assert some? (core/moment-js-format-str (:format-str (core/ts-formatter))))
+                 :format (s/assert some? (dt/moment-fmt))
                  :confirm-btn-text "OK"
                  :cancel-btn-text "Cancel"
                  :on-date-change (fn [new-date-time]

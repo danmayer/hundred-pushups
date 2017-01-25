@@ -3,6 +3,7 @@
             [clojure.spec :as s]
             [hundred-pushups.test-helper :refer :all]
             [hundred-pushups.core :refer :all]
+            [hundred-pushups.datetime :as dt]
             [com.gfredericks.test.chuck.clojure-test :refer [checking]]))
 
 (use-fixtures :once instrument-all check-asserts)
@@ -14,9 +15,6 @@
 (defn complete-next-day [ts test-log log]
   (let [next-day (suggested-day test-log log)]
     (complete-day log next-day ts)))
-
-(deftest now-test
-  (is (inst? (now))))
 
 (deftest suggested-day-spec
   (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day)]
@@ -62,17 +60,17 @@
 
   (testing "suggests a test if previous workout was less than suggested"
     (is (= :exr/do-test
-           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts (ts 0)}]
-                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (ts 1)}]))))
+           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts (dt/inst 0)}]
+                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (dt/inst 1)}]))))
 
   (testing "suggests reps if previous workout was less than suggested previously, but
             a more recent test has been completed"
     (is (= {:exr/suggested-circuit
             {:exr/pushup-reps 5 :exr/plank-reps 6}
               :exr/sets 4}
-           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (ts 0)}
-                           {:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (ts 2)}]
-                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (ts 1)}]))))
+           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (dt/inst 0)}
+                           {:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (dt/inst 2)}]
+                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (dt/inst 1)}]))))
 
   (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day)]
     (checking
@@ -86,13 +84,6 @@
            (when (and new-circ last-circuit)
              (is (<= (:exr/pushup-reps last-circuit) (:exr/pushup-reps new-circ)))
              (is (<= (:exr/plank-reps last-circuit) (:exr/plank-reps new-circ))))))))))
-
-(deftest local-date-test
-  (testing "returns date based on timezone"
-    (is (= [2016 01 01]
-           (local-date #inst "2016-01-02T01:01:01Z")))
-    (is (= [2016 01 02]
-           (local-date #inst "2016-01-02T12:01:01Z")))))
 
 (deftest last-days-log-test
   (testing "returns empty vector if there are no days"

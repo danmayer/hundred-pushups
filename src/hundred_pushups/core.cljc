@@ -2,15 +2,17 @@
   (:require
     [clojure.spec.test :as st]
     [clojure.spec :as s]
-    [clojure.string :as str]
-
+    [clojure.string :as str] ;; TODO - remove
+    [hundred-pushups.datetime :as dt]
+    ;; TODO - remove
     #?@(:clj  [[clj-time.coerce :as time.coerce]
                [clj-time.core :as time]
                [clj-time.format :as time.format]]
         :cljs [[cljs-time.coerce :as time.coerce]
                [cljs-time.core :as time]
                [cljs-time.format :as time.format]
-               [cljsjs.moment :as moment]])))
+               [cljsjs.moment :as moment]])
+    ))
 
 ;;;;;; specs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -42,54 +44,11 @@
 
 ;;;;;; private ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(def dummy-ts (dt/inst 0))
+
 (defn parse-int [x]
   #?(:clj  (Integer/parseInt x)
      :cljs (js/parseInt x)))
-
-;; TODO - extract time stuff into ts namespace
-(defn now []
-  (time.coerce/to-date (time/now)))
-
-(defn ts [second-since-epoch]
-  (time.coerce/to-date second-since-epoch))
-
-(defn ts-formatter []
-  (:basic-date-time-no-ms time.format/formatters))
-
-(defn time-str [ts]
-  (time.format/unparse (ts-formatter) (time/date-time ts)))
-
-;; Because of course moment.js uses a custom set of parsing tokens
-;; http://momentjs.com/docs/#/parsing/string-format/
-(defn moment-js-format-str [format-str]
-  (-> (s/assert some? format-str)
-      (str/replace "yyyy" "YYYY")
-      (str/replace "dd" "DD")))
-
-(defn parse-time-str [format-str]
-  (time.format/parse (ts-formatter) format-str))
-
-(def dummy-ts (ts 0))
-
-(defn local-date [inst]
-  (let [dt (time.coerce/from-date inst)
-        local-dt #?(:cljs (time/to-default-time-zone dt)
-                    :clj (time/to-time-zone (time.coerce/to-date-time dt) (time/default-time-zone)))]
-    [(time/year local-dt)
-     (time/month local-dt)
-     (time/day local-dt)]))
-
-#?(:cljs
-   (defn parse-moment-str [moment-str]
-     (if-not moment-str
-       nil
-       (let [time-str (-> moment-str
-                          (js/moment (moment-js-format-str (:format-str (ts-formatter))))
-                          (.utc)
-                          (.format (moment-js-format-str (:format-str (ts-formatter))))
-                          (str/replace "+00:00" "Z")
-                          (str/replace "'T'" "T"))]
-         (time.coerce/to-date (time.format/parse (ts-formatter) time-str))))))
 
 (defn div-ceil [num den]
   (let [q (quot num den)
@@ -109,7 +68,7 @@
           [k (f v)])))
 
 (defn last-days-log [circuit-log]
-  (vec (last (partition-by (comp local-date :exr/ts) circuit-log))))
+  (vec (last (partition-by (comp dt/local-date :exr/ts) circuit-log))))
 
 (s/fdef day->log
         :args (s/cat :day :exr/day
@@ -123,7 +82,7 @@
 
 (defn but-last-day [circuit-log]
   (->> circuit-log
-       (partition-by (comp local-date :exr/ts) )
+       (partition-by (comp dt/local-date :exr/ts) )
        butlast
        flatten
        vec))
@@ -168,7 +127,7 @@
       {:exr/sets 4
        :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
 
-      (ts-greater? (:exr/ts last-circuit (ts 0)) (:exr/ts last-test))
+      (ts-greater? (:exr/ts last-circuit (dt/inst 0)) (:exr/ts last-test))
       {:exr/sets 4
        :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
 

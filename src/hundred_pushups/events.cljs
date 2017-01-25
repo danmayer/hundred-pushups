@@ -7,6 +7,7 @@
     [day8.re-frame.async-flow-fx :as async-flow-fx]
     [glittershark.core-async-storage :refer [get-item set-item]]
     [hundred-pushups.core :as core]
+    [hundred-pushups.datetime :as dt]
     [hundred-pushups.db :as db :refer [default-db]]
     [re-frame.core :refer [reg-event-db after reg-event-fx dispatch reg-fx]]
     [re-frame.interceptor :refer [->interceptor get-effect get-coeffect assoc-coeffect assoc-effect]]
@@ -186,13 +187,13 @@
  :append-test
  [validate-spec rn-debug]
   (fn [db [_event-name test-circuit]]
-    (update db :completed-test-log conj (assoc test-circuit :exr/ts (core/now)))))
+    (update db :completed-test-log conj (assoc test-circuit :exr/ts (dt/now)))))
 
 (reg-event-db
  :complete-day
  [validate-spec rn-debug]
  (fn [db [_event-name circuit ui-state]]
-   (update db :completed-circuit-log into (core/merge-day-changes circuit ui-state (core/now)))))
+   (update db :completed-circuit-log into (core/merge-day-changes circuit ui-state (dt/now)))))
 
 (reg-event-db
  :save-white-list
@@ -223,4 +224,4 @@
  :set-simulated-time
  [validate-spec rn-debug]
  (fn [db [_event-name simulated-time]]
-   (assoc db :simulated-time (core/parse-moment-str simulated-time))))
+   (assoc db :simulated-time (dt/moment-str->inst simulated-time))))
