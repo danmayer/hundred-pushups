@@ -235,9 +235,28 @@
 (deftest todays-range-test
   (is (= [(time/today-at 9 00) (time/today-at 17 00)], (todays-range {:monday ["9am" "5pm"]
                                                                       :tuesday ["9am" "5pm"]
-                                                                      :wendnesday ["9am" "5pm"]
+                                                                      :wednesday ["9am" "5pm"]
                                                                       :thursday ["9am" "5pm"]
                                                                       :friday ["9am" "5pm"]
                                                                       :saturday ["9am" "5pm"]
                                                                       :sunday ["9am" "5pm"]}
                                                                      []))))
+
+;; nil nothing left to do
+;; or you are done
+;; pass in current-time
+;; should we auto-black list next hour
+(deftest next-workout-time-test
+  (let [ts-range (todays-range {:monday ["9am" "5pm"]
+                                :tuesday ["9am" "5pm"]
+                                :wednesday ["9am" "5pm"]
+                                :thursday ["9am" "5pm"]
+                                :friday ["9am" "5pm"]
+                                :saturday ["9am" "5pm"]
+                                :sunday ["9am" "5pm"]}
+                               [])]
+    (is (= (time/today-at 11 00) (next-workout-time {:current-time (time/today-at 11 00) :num-sets 4 :available-ranges ts-range})))
+    (is (= nil (next-workout-time {:current-time (time/today-at 11 00) :num-sets 0 :available-ranges ts-range})))
+    (is (= (time/today-at 9 00) (next-workout-time {:current-time (time/today-at 6 00) :num-sets 4 :available-ranges ts-range})))
+    (is (= nil (next-workout-time {:current-time (time/today-at 19 00) :num-sets 4 :available-ranges ts-range})))
+    ))
