@@ -2,17 +2,7 @@
   (:require
     [clojure.spec.test :as st]
     [clojure.spec :as s]
-    [clojure.string :as str] ;; TODO - remove
-    [hundred-pushups.datetime :as dt]
-    ;; TODO - remove
-    #?@(:clj  [[clj-time.coerce :as time.coerce]
-               [clj-time.core :as time]
-               [clj-time.format :as time.format]]
-        :cljs [[cljs-time.coerce :as time.coerce]
-               [cljs-time.core :as time]
-               [cljs-time.format :as time.format]
-               [cljsjs.moment :as moment]])
-    ))
+    [hundred-pushups.datetime :as dt]))
 
 ;;;;;; specs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
