@@ -182,13 +182,13 @@
  :append-test
  [validate-spec rn-debug]
   (fn [db [_event-name test-circuit]]
-    (update db :completed-test-log conj (assoc test-circuit :exr/ts (dt/now)))))
+    (update db :tests conj (assoc test-circuit :exr/ts (dt/now)))))
 
 (reg-event-db
  :complete-day
  [validate-spec rn-debug]
  (fn [db [_event-name circuit ui-state]]
-   (update db :completed-circuit-log into (core/merge-day-changes circuit ui-state (dt/now)))))
+   (update db :circuits into (core/merge-day-changes circuit ui-state (dt/now)))))
 
 (reg-event-db
  :save-white-list

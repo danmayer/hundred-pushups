@@ -14,8 +14,8 @@
   (s/keys :req-un [::completed-stages
                    ::schedules
                    ::ui-state
-                   :exr/completed-circuit-log
-                   :exr/completed-test-log
+                   :exr/circuits
+                   :exr/tests
                    ::selected-tab
                    ::actual-time
                    ::simulated-time
@@ -32,8 +32,7 @@
                  :schedules {:white-list {:monday ["9am" "5pm"]
                                           :tuesday ["9am" "5pm"]}
                              :black-list []}
-                 :test-log []
-                 :completed-test-log []
-                 :completed-circuit-log []
+                 :circuits []
+                 :tests []
                  :actual-time #inst "2017-01-15T23:49:36Z"
                  :simulated-time nil})

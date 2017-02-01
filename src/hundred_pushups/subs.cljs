@@ -33,10 +33,10 @@
  :days-exercise
  (fn [db _]
    (core/suggested-day
-    {:exr/completed-circuit-log
-     (:completed-circuit-log db)
-     :exr/completed-test-log
-     (:completed-test-log db)})))
+     {:exr/circuits
+      (:circuits db)
+      :exr/tests
+      (:tests db)})))
 
 (reg-sub
  :selected-tab
