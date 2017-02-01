@@ -106,11 +106,11 @@
 ;;;;;; public ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; TODO - rename
-(s/fdef suggested-day1
+(s/fdef suggested-day
         :args (s/cat
                :history :exr/history)
         :ret :exr/day)
-(defn suggested-day1 [history]
+(defn suggested-day [history]
   (let [{:keys [:exr/completed-circuit-log
                 :exr/completed-test-log]} history
         last-circuit (last completed-circuit-log) 
@@ -128,7 +128,7 @@
        :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
 
       (completed-circuit?
-       (suggested-day1
+       (suggested-day
         {:exr/completed-test-log
          completed-test-log
          :exr/completed-circuit-log
