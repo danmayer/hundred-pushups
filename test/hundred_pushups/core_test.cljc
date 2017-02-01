@@ -8,11 +8,6 @@
 
 (use-fixtures :once instrument-all check-asserts)
 
-;; TODO - delete
-(defn complete-day [circuit-log day ts]
-  (into circuit-log
-        (day->log day ts)))
-
 ;; TODO - rename
 (s/fdef complete-day1
         :args (s/cat
@@ -22,23 +17,18 @@
 (defn complete-day1 [history suggested-circuits ts]
   (update history :exr/completed-circuit-log into (day->log suggested-circuits ts)))
 
-;; TODO - delete
-(defn complete-next-day [ts test-log log]
-  (let [next-day (suggested-day test-log log)]
-    (complete-day log next-day ts)))
-
 ;; TODO - rename
 (defn complete-next-day1 [history ts]
   (let [next-day (suggested-day1 history)]
     (complete-day1 history next-day ts)))
 
 (deftest suggested-day-spec
-  (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day)]
+  (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day1)]
     (checking
      "conforms to spec"
      20
      [args (s/gen args-sp)]
-     (is (conforms-to? ret-sp (apply suggested-day args))))))
+     (is (conforms-to? ret-sp (apply suggested-day1 args))))))
 
 (deftest suggesting-sets-and-reps
   (testing "suggests 4 x 50% reps (rounding up) after initial test"

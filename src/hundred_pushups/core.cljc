@@ -105,37 +105,6 @@
 
 ;;;;;; public ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; TODO - delete
-(s/fdef suggested-day
-        :args (s/cat
-               :completed-test-log (s/and :exr/completed-test-log
-                                          (fn [x] (pos? (count x))))
-               :circuit-log :exr/completed-circuit-log)
-        :ret :exr/day)
-(defn suggested-day [completed-test-log circuit-log]
-  (let [last-circuit (last circuit-log)
-        last-test (last completed-test-log)]
-    (cond
-      (nil? last-test)
-      :exr/do-test
-
-      (nil? last-circuit)
-      {:exr/sets 4
-       :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
-
-      (ts-greater? (:exr/ts last-circuit (dt/inst 0)) (:exr/ts last-test))
-      {:exr/sets 4
-       :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
-
-      (completed-circuit?
-       (suggested-day completed-test-log (but-last-day circuit-log))
-       circuit-log)
-      {:exr/sets 4
-       :exr/suggested-circuit (map-vals inc (dissoc last-circuit :exr/ts))}
-
-      :else
-      :exr/do-test)))
-
 ;; TODO - rename
 (s/fdef suggested-day1
         :args (s/cat
@@ -159,15 +128,17 @@
        :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
 
       (completed-circuit?
-       (suggested-day completed-test-log (but-last-day completed-circuit-log))
+       (suggested-day1
+        {:exr/completed-test-log
+         completed-test-log
+         :exr/completed-circuit-log
+         (but-last-day completed-circuit-log)})
        completed-circuit-log)
       {:exr/sets 4
        :exr/suggested-circuit (map-vals inc (dissoc last-circuit :exr/ts))}
 
       :else
       :exr/do-test)))
-
-
 
 (defn ui-state->path [ui-state]
   (concat
