@@ -3,12 +3,6 @@
             [hundred-pushups.core :as core]
             [hundred-pushups.db :as db]))
 
-;; FIXME - delete after android no longer uses this
-(reg-sub
-  :get-greeting
-  (fn [db _]
-    (:greeting db)))
-
 (reg-sub
  :stage
  (fn [db _]
