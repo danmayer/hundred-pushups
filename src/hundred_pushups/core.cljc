@@ -98,14 +98,8 @@
   ;; <= works for instants in CLJS, but not CLJ
   (neg? (compare ts1 ts2)))
 
-;; TODO - pull into util
-(defn dbg [l x ]
-  (prn l x)
-  x)
-
 ;;;;;; public ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; TODO - rename
 (s/fdef suggested-day
         :args (s/cat
                :history :exr/history)

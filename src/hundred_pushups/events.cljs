@@ -169,10 +169,6 @@
  (fn [db [_event-name path val]]
    (update db :ui-state #(assoc-in % path val))))
 
-(defn dbg [l x]
-  (prn l x)
-  x)
-
 (reg-event-db
  :ui-state/clear
  [validate-spec rn-debug]
