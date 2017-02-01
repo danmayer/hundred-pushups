@@ -150,13 +150,12 @@
 (reg-event-fx
  :db/save.er
  (fn [_world event]
-   (println event)
    {}))
 
 (reg-event-fx
  :db/save.ok
  (fn [_world event]
-   (println event)))
+   {}))
 
 (reg-event-fx
  :db/save
