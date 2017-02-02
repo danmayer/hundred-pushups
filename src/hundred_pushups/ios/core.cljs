@@ -1,9 +1,12 @@
 (ns hundred-pushups.ios.core
   (:require [reagent.core :as r :refer [atom]]
             [clojure.pprint :as pp]
+            [cljs.spec :as s]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
+            [hundred-pushups.core :as core]
             [hundred-pushups.events]
-            [hundred-pushups.subs]))
+            [hundred-pushups.subs]
+            [hundred-pushups.datetime :as dt]))
 
 (def ReactNative (js/require "react-native"))
 ;; From https://github.com/skv-headless/react-native-scrollable-tab-view
@@ -12,7 +15,7 @@
 ;; at http://blog.fikesfarm.com/posts/2015-07-24-using-react-native-components-in-clojurescript.html
 ;; Note: the React packager is now requiring packages by by internal numerica ID, so this may break in production.
 (def ScrollableTabView (js/require "react-native-scrollable-tab-view/index.js"))
-
+(def DatePicker (.-default (js/require "react-native-datepicker/index.js")))
 
 (def app-registry (.-AppRegistry ReactNative))
 (def linking (.-Linking ReactNative))
@@ -24,13 +27,25 @@
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
 (def scrollable-tab-view (r/adapt-react-class ScrollableTabView))
 
+(def date-picker (r/adapt-react-class DatePicker))
+
 (def pushup-form-url "http://www.100pushups.com/perfect-pushups-posture/")
 
 (def styles
   {:tab {:flex 1
-            :padding-top 10
-            :padding-right 10
-            :padding-left 10}})
+         :padding-top 10
+         :padding-right 10
+         :padding-left 10}
+   :section {:font-weight "bold"
+             :font-size 20
+             :padding-top 20
+             :padding-bottom 5}
+   })
+
+(defn dispatch-timer-event []
+  (dispatch [:timer (dt/now)]))
+
+(defonce do-timer (js/setInterval dispatch-timer-event 1000))
 
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
@@ -165,16 +180,34 @@
 
 (defn dev-menu []
   [view {:style {:flex 1}}
-   [text {} "DB"]
-   [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 20}
+   [text {:style (-> styles :section)} "DB"]
+   [scroll-view {:style {:padding-top 20}}
+    [text {:style {:font-family "Menlo"
+                   :background-color "lightgrey"}}
+     (pp/write @(subscribe [:db]) :stream nil)]]
+   [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 10}
                          :on-press #(do
                                       (dispatch [:db/reset])
                                       (dispatch [:db/save]))}
     [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Reset DB"]]
-   [scroll-view {:style {:padding-top 20}}
-    [text {:style {:font-family "Menlo"
-                   :background-color "lightgrey"}}
-     (pp/write @(subscribe [:db]) :stream nil)]]])
+   [text {:style (-> styles :section)} "System time"]
+   [text {} (str "Actual time: " @(subscribe [:actual-time]))]
+   [text {} (str "Simulated time: ")]
+   [date-picker {:style {:width 300}
+                 :date (s/assert some? (dt/inst->str (or
+                                                      @(subscribe [:simulated-time])
+                                                      @(subscribe [:actual-time]))))
+                 :mode "datetime"
+                 :format (s/assert some? (dt/moment-fmt))
+                 :confirm-btn-text "OK"
+                 :cancel-btn-text "Cancel"
+                 :on-date-change (fn [new-date-time]
+                                   (dispatch [:set-simulated-time new-date-time]))}]
+   [touchable-highlight {:style {:background-color "#999" :padding 10 :border-radius 5 :margin-top 10}
+                         :on-press #(do
+                                      (dispatch [:set-simulated-time nil])
+                                      (dispatch [:db/save]))}
+    [text {:style {:color "white" :text-align "center" :font-weight "bold"}} "Stop simulating time"]]])
 
 (defn app-root []
   ;; We intentionally only deref the selected tab once, when the component mounts.

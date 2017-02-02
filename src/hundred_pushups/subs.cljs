@@ -45,3 +45,13 @@
  :selected-tab
  (fn [db _]
    (get hundred-pushups.db/tabs (:selected-tab db))))
+
+(reg-sub
+ :actual-time
+ (fn [db _]
+   (:actual-time db)))
+
+(reg-sub
+ :simulated-time
+ (fn [db _]
+   (:simulated-time db)))
