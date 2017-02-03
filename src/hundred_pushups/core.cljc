@@ -95,6 +95,32 @@
   ;; <= works for instants in CLJS, but not CLJ
   (neg? (compare ts1 ts2)))
 
+(declare suggested-day)
+
+(defn analyze-history [history]
+  "Given a history, adds key/value pairs
+   regarding the state of the history"
+  (let [{:keys [:exr/circuits
+                :exr/tests]} history
+        last-circuit (last circuits)
+        last-test (last tests)
+        defaults {:fresh-test? false
+                  :last-workout-completed? false}]
+
+    (cond-> (merge history defaults)
+      (and (nil? last-circuit) last-test)
+      (assoc :fresh-test? true
+             :last-workout-completed? false)
+
+      (ts-greater? (:exr/ts last-circuit (dt/inst 0)) (:exr/ts last-test))
+      (assoc :fresh-test? true)
+
+      (and last-circuit
+           (completed-circuit?
+            (suggested-day {:exr/tests tests :exr/circuits (but-last-day circuits)})
+            circuits))
+      (assoc :last-workout-completed? true))))
+
 ;;;;;; public ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (s/fdef suggested-day
@@ -103,28 +129,18 @@
         :ret :exr/action)
 (defn suggested-day [history]
   (let [{:keys [:exr/circuits
-                :exr/tests]} history
+                :exr/tests
+                :last-workout-completed?
+                :fresh-test?]} (analyze-history history)
         last-circuit (last circuits)
         last-test (last tests)]
+
     (cond
-      (nil? last-test)
-      :exr/do-test
-
-      (nil? last-circuit)
+      fresh-test?
       {:exr/sets 4
        :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
 
-      (ts-greater? (:exr/ts last-circuit (dt/inst 0)) (:exr/ts last-test))
-      {:exr/sets 4
-       :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
-
-      (completed-circuit?
-        (suggested-day
-          {:exr/tests
-           tests
-         :exr/circuits
-           (but-last-day circuits)})
-        circuits)
+      last-workout-completed?
       {:exr/sets 4
        :exr/suggested-circuit (map-vals inc (dissoc last-circuit :exr/ts))}
 
