@@ -8,13 +8,17 @@
 
 (use-fixtures :once instrument-all check-asserts)
 
-(defn complete-day [circuit-log day ts]
-  (into circuit-log
-        (day->log day ts)))
+(s/fdef complete-day
+        :args (s/cat
+               :history :exr/history
+               :circuits :exr/suggested-circuits
+               :ts :exr/ts))
+(defn complete-day [history suggested-circuits ts]
+  (update history :exr/circuits into (day->log suggested-circuits ts)))
 
-(defn complete-next-day [ts test-log log]
-  (let [next-day (suggested-day test-log log)]
-    (complete-day log next-day ts)))
+(defn complete-next-day [history ts]
+  (let [next-day (suggested-day history)]
+    (complete-day history next-day ts)))
 
 (deftest suggested-day-spec
   (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day)]
@@ -24,63 +28,123 @@
      [args (s/gen args-sp)]
      (is (conforms-to? ret-sp (apply suggested-day args))))))
 
+(deftest analyze-history-test
+  (testing "after initial test"
+    (is (=
+         {:last-workout-completed? false
+          :fresh-test? true}
+         (-> (analyze-history
+              {:exr/tests
+               [{:exr/pushup-reps 10
+                 :exr/plank-reps 15
+                 :exr/ts dummy-ts}]
+               :exr/circuits []})
+             (select-keys [:last-workout-completed? :fresh-test?])
+             ))))
+  (testing "after completing first day"
+    (let [ts #inst "2016-01-01"]
+      (is (=
+           {:last-workout-completed? true
+            :fresh-test? false}
+           (-> {:exr/tests
+                [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts dummy-ts}]
+                :exr/circuits
+                []}
+               (complete-next-day ts)
+               (analyze-history)
+               (select-keys [:last-workout-completed? :fresh-test?]))))))
+
+  (testing "previous workout was less than suggested"
+    (is (= {:last-workout-completed? false
+            :fresh-test? false}
+           (-> (analyze-history
+                {:exr/tests
+                 [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts (dt/inst 0)}]
+                 :exr/circuits
+                 [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (dt/inst 1)}]})
+               (select-keys [:last-workout-completed? :fresh-test?])
+               ))))
+
+  (testing "previous workout was less than suggested previously, but
+            a more recent test has been completed"
+    (is (= {:last-workout-completed? false
+            :fresh-test? true}
+           (-> (analyze-history
+                {:exr/tests
+                 [{:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (dt/inst 0)}
+                  {:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (dt/inst 2)}]
+                 :exr/circuits
+                 [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (dt/inst 1)}]})
+               (select-keys [:last-workout-completed? :fresh-test?]))))))
+
 (deftest suggesting-sets-and-reps
   (testing "suggests 4 x 50% reps (rounding up) after initial test"
     (is (= {:exr/suggested-circuit
             {:exr/pushup-reps 5 :exr/plank-reps 8}
             :exr/sets 4}
            (suggested-day
-            [{:exr/pushup-reps 10
-              :exr/plank-reps 15
-              :exr/ts dummy-ts}]
-            []))))
+            {:exr/tests
+             [{:exr/pushup-reps 10
+               :exr/plank-reps 15
+               :exr/ts dummy-ts}]
+             :exr/circuits []}))))
 
   (testing "suggests 4 x 50% + 1 after one day"
     (let [ts #inst "2016-01-01"]
       (is (= {:exr/suggested-circuit
               {:exr/pushup-reps 6 :exr/plank-reps 9}
               :exr/sets 4}
-             (let [test-log [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts dummy-ts}]
-                   circuit-log []]
-               (->> circuit-log
-                    (complete-next-day ts test-log)
-                    (suggested-day test-log)))))))
+             (-> {:exr/tests
+                  [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts dummy-ts}]
+                  :exr/circuits
+                  []}
+                 (complete-next-day ts)
+                 (suggested-day))))))
 
   (testing "suggests 4 x 50% + 2 after two day"
     (let [ts #inst "2016-01-01"]
       (is (= {:exr/suggested-circuit
               {:exr/pushup-reps 7 :exr/plank-reps 10}
               :exr/sets 4}
-             (let [test-log [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts dummy-ts}]
-                   circuit-log []]
-               (->> circuit-log
-                    (complete-next-day ts test-log)
-                    (complete-next-day ts test-log)
-                    (suggested-day test-log)))))))
+             (-> {:exr/tests
+                  [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts dummy-ts}]
+                  :exr/circuits
+                  []}
+                 (complete-next-day ts)
+                 (complete-next-day ts)
+                 (suggested-day))))))
 
   (testing "suggests a test if previous workout was less than suggested"
     (is (= :exr/do-test
-           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts (dt/inst 0)}]
-                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (dt/inst 1)}]))))
+           (suggested-day
+            {:exr/tests
+             [{:exr/pushup-reps 10 :exr/plank-reps 15 :exr/ts (dt/inst 0)}]
+             :exr/circuits
+             [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (dt/inst 1)}]}))))
 
   (testing "suggests reps if previous workout was less than suggested previously, but
             a more recent test has been completed"
     (is (= {:exr/suggested-circuit
             {:exr/pushup-reps 5 :exr/plank-reps 6}
-              :exr/sets 4}
-           (suggested-day [{:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (dt/inst 0)}
-                           {:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (dt/inst 2)}]
-                          [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (dt/inst 1)}]))))
+            :exr/sets 4}
+           (suggested-day
+            {:exr/tests
+             [{:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (dt/inst 0)}
+              {:exr/pushup-reps 10 :exr/plank-reps 12 :exr/ts (dt/inst 2)}]
+             :exr/circuits
+             [{:exr/pushup-reps 0 :exr/plank-reps 0 :exr/ts (dt/inst 1)}]}))))
 
   (let [{args-sp :args ret-sp :ret} (s/get-spec #'suggested-day)]
     (checking
      "suggested circuit always has reps equal to or greater than last circuit reps (or requires a test)"
      10
-     [[test-log circuit-log] (s/gen args-sp)]
-     (let [day (suggested-day test-log circuit-log)]
+     [args (s/gen args-sp)]
+     (let [[history] args
+           {:keys [:exr/circuits :exr/tests]} history
+           day (suggested-day history)]
        (when-not (= :exr/do-test day)
-         (let [new-circ (:exr/completed-circuit day)
-               last-circuit (last circuit-log)]
+         (let [new-circ (:exr/circuit day)
+               last-circuit (last circuits)]
            (when (and new-circ last-circuit)
              (is (<= (:exr/pushup-reps last-circuit) (:exr/pushup-reps new-circ)))
              (is (<= (:exr/plank-reps last-circuit) (:exr/plank-reps new-circ))))))))))

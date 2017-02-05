@@ -150,13 +150,12 @@
 (reg-event-fx
  :db/save.er
  (fn [_world event]
-   (println event)
    {}))
 
 (reg-event-fx
  :db/save.ok
  (fn [_world event]
-   (println event)))
+   {}))
 
 (reg-event-fx
  :db/save
@@ -168,10 +167,6 @@
  [validate-spec rn-debug]
  (fn [db [_event-name path val]]
    (update db :ui-state #(assoc-in % path val))))
-
-(defn dbg [l x]
-  (prn l x)
-  x)
 
 (reg-event-db
  :ui-state/clear
@@ -187,13 +182,13 @@
  :append-test
  [validate-spec rn-debug]
   (fn [db [_event-name test-circuit]]
-    (update db :completed-test-log conj (assoc test-circuit :exr/ts (dt/now)))))
+    (update db :tests conj (assoc test-circuit :exr/ts (dt/now)))))
 
 (reg-event-db
  :complete-day
  [validate-spec rn-debug]
  (fn [db [_event-name circuit ui-state]]
-   (update db :completed-circuit-log into (core/merge-day-changes circuit ui-state (dt/now)))))
+   (update db :circuits into (core/merge-day-changes circuit ui-state (dt/now)))))
 
 (reg-event-db
  :save-white-list

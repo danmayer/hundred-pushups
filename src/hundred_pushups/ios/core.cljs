@@ -179,9 +179,9 @@
      [invalid-stage])])
 
 (defn dev-menu []
-  [view {:style {:flex 1}}
+  [view {:style {:flex 1 :padding-bottom 20}}
    [text {:style (-> styles :section)} "DB"]
-   [scroll-view {:style {:padding-top 20}}
+   [scroll-view {:style {}}
     [text {:style {:font-family "Menlo"
                    :background-color "lightgrey"}}
      (pp/write @(subscribe [:db]) :stream nil)]]
