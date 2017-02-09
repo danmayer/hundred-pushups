@@ -30,6 +30,7 @@
                                   ;; react-native-datepicker uses
                                   ;; moment, and we need to convert to/from it
                                   [cljsjs/moment "2.17.1-0"]]
+                   :plugins [[lein-doo "0.1.7"]]
                    :source-paths ["src" "env/dev"]
                    :cljsbuild    {:builds [{:id           "ios"
                                             :source-paths ["src" "env/dev"]
@@ -44,7 +45,13 @@
                                             :compiler     {:output-to     "target/android/not-used.js"
                                                            :main          "env.android.main"
                                                            :output-dir    "target/android"
-                                                           :optimizations :none}}]}
+                                                           :optimizations :none}}
+                                           {:id            "node-test"
+                                            :source-paths  ["src" "test"]
+                                            :compiler      {:output-to "target/testable.js"
+                                                            :output-dir "target"
+                                                            :main hundred-pushups.node-runner
+                                                            :target :nodejs}}]}
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}
              :prod {:cljsbuild {:builds [{:id           "ios"
                                           :source-paths ["src" "env/prod"]

@@ -1,8 +1,8 @@
 (ns hundred-pushups.core-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [testing use-fixtures is deftest]]
             [clojure.spec :as s]
-            [hundred-pushups.test-helper :refer :all]
-            [hundred-pushups.core :refer :all]
+            [hundred-pushups.test-helper :refer [instrument-all check-asserts] :include-macros true]
+            [hundred-pushups.core :refer [day->log suggested-day analyze-history dummy-ts last-days-log completed-circuit? parse-int merge-day-changes format-whitelist-row valid-hour-time]]
             [hundred-pushups.datetime :as dt]
             [com.gfredericks.test.chuck.clojure-test :refer [checking]]))
 

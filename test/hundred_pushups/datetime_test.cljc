@@ -1,8 +1,7 @@
 (ns hundred-pushups.datetime-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [testing deftest is]]
             [clojure.spec :as s]
-            [hundred-pushups.test-helper :refer :all]
-            [hundred-pushups.datetime :refer :all]
+            [hundred-pushups.datetime :refer [inst ct-fmt->moment-fmt now inst->str local-date]]
             [com.gfredericks.test.chuck.clojure-test :refer [checking]]))
 
 (deftest now-test
