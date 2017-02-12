@@ -2,5 +2,5 @@ language: clojure
 lein: 2.6.1
 script:
 - lein test
-- lein with-profile prod cljsbuild once ios
 - lein with-profile prod cljsbuild once android
+- lein with-profile prod cljsbuild once ios
