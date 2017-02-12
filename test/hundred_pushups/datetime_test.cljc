@@ -21,7 +21,9 @@
 
 (deftest local-date-test
   (testing "returns date based on timezone"
+    (is (= 2016
+           (first (local-date #inst "2016-01-02T01:01:01Z"))))
     (is (= [2016 01 01]
-           (local-date #inst "2016-01-02T01:01:01Z")))
+           (local-date #inst "2016-01-02T01:01:01Z" "America/Denver")))
     (is (= [2016 01 02]
-           (local-date #inst "2016-01-02T12:01:01Z")))))
+           (local-date #inst "2016-01-02T12:01:01Z" "America/Denver")))))

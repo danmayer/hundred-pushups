@@ -12,7 +12,9 @@
                  [org.clojure/clojurescript "1.9.293"]
                  [re-frame "0.8.0"]
                  [reagent "0.6.0" :exclusions [cljsjs/react cljsjs/react-dom cljsjs/react-dom-server]]
-                 ]
+                 ;; react-native-datepicker uses
+                 ;; moment, and we need to convert to/from it
+                 [cljsjs/moment "2.17.1-0"]]
   :plugins [[lein-cljsbuild "1.1.4"]
             [lein-figwheel "0.5.8"]]
   :clean-targets ["target/" "index.ios.js" "index.android.js"]
@@ -26,10 +28,7 @@
              :dev {:dependencies [[figwheel-sidecar "0.5.8"]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/test.check "0.9.0"]
-                                  [com.gfredericks/test.chuck "0.2.7"]
-                                  ;; react-native-datepicker uses
-                                  ;; moment, and we need to convert to/from it
-                                  [cljsjs/moment "2.17.1-0"]]
+                                  [com.gfredericks/test.chuck "0.2.7"]]
                    :plugins [[lein-doo "0.1.7"]]
                    :source-paths ["src" "env/dev"]
                    :cljsbuild    {:builds [{:id           "ios"
@@ -58,6 +57,7 @@
                                           :compiler     {:output-to     "index.ios.js"
                                                          :main          "env.ios.main"
                                                          :output-dir    "target/ios"
+                                                         :language-in :ecmascript5
                                                          :static-fns    true
                                                          :optimize-constants true
                                                          :optimizations :simple
@@ -67,6 +67,7 @@
                                           :compiler     {:output-to     "index.android.js"
                                                          :main          "env.android.main"
                                                          :output-dir    "target/android"
+                                                         :language-in :ecmascript5
                                                          :static-fns    true
                                                          :optimize-constants true
                                                          :optimizations :simple

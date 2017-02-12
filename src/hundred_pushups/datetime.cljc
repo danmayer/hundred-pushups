@@ -68,12 +68,17 @@
 
 (defn local-date
   "Given an inst, returns a [local-date local-month local-day]"
-  [inst]
-  (let [dt (time.coerce/from-date inst)
-        local-dt #?(:cljs (time/to-default-time-zone dt)
-                    :clj (time/to-time-zone (time.coerce/to-date-time dt) (time/default-time-zone)))]
-    [(time/year local-dt)
-     (time/month local-dt)
-     (time/day local-dt)]))
+  ([inst]
+   (local-date inst :default))
+  ([inst zone]
+   (let [dt (time.coerce/from-date inst)
+         local-dt #?(:cljs (time/to-default-time-zone dt)
+                     :clj (time/to-time-zone (time.coerce/to-date-time dt)
+                                             (if (= :default zone)
+                                               (time/default-time-zone)
+                                               (time/time-zone-for-id zone))))]
+     [(time/year local-dt)
+      (time/month local-dt)
+      (time/day local-dt)])))
 
 
