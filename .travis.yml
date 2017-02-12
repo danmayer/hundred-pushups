@@ -1,2 +1,5 @@
 language: clojure
-script: lein do test, prod-build
+lein: 2.6.1
+script:
+- lein test
+- lein prod-build
