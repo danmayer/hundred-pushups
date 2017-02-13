@@ -49,7 +49,7 @@
                                             :source-paths  ["src" "test"]
                                             :compiler      {:output-to "target/testable.js"
                                                             :output-dir "target"
-                                                            :main hundred-pushups.node-runner
+                                                            :main hundred-pushups.doo-runner
                                                             :target :nodejs}}]}
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}
              :prod {:cljsbuild {:builds [{:id           "ios"
