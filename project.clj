@@ -21,14 +21,15 @@
   :aliases {"prod-build" ^{:doc "Recompile code with prod profile."}
             ["do" "clean"
              ["with-profile" "prod" "cljsbuild" "once" ]]}
-  :profiles {:tools {:plugins [[com.jakemccrary/lein-test-refresh "0.18.0"]
-                               [venantius/ultra "0.5.0"]]
-                     :dependencies [[proto-repl-charts "0.3.1"]
-                                    [proto-repl "0.3.1"]]}
+  :profiles {:project-tools {:plugins [[com.jakemccrary/lein-test-refresh "0.18.0"]
+                                       [venantius/ultra "0.5.0"]]
+                             :dependencies [[proto-repl-charts "0.3.1"]
+                                            [proto-repl "0.3.1"]]}
              :dev {:dependencies [[figwheel-sidecar "0.5.8"]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/test.check "0.9.0"]
                                   [com.gfredericks/test.chuck "0.2.7"]]
+                   :plugins [[lein-doo "0.1.7"]]
                    :source-paths ["src" "env/dev"]
                    :cljsbuild    {:builds [{:id           "ios"
                                             :source-paths ["src" "env/dev"]
@@ -43,7 +44,13 @@
                                             :compiler     {:output-to     "target/android/not-used.js"
                                                            :main          "env.android.main"
                                                            :output-dir    "target/android"
-                                                           :optimizations :none}}]}
+                                                           :optimizations :none}}
+                                           {:id            "node-test"
+                                            :source-paths  ["src" "test"]
+                                            :compiler      {:output-to "target/testable.js"
+                                                            :output-dir "target"
+                                                            :main hundred-pushups.doo-runner
+                                                            :target :nodejs}}]}
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}
              :prod {:cljsbuild {:builds [{:id           "ios"
                                           :source-paths ["src" "env/prod"]
