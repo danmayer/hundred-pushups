@@ -118,7 +118,7 @@ This method was used initially since it was fast, convenient,
 and provided good stack traces. It may go away if Node testing
 is fast enough.
 
-`lein with-profile +tools test-refresh :changes-only`
+`lein with-profile +project-tools test-refresh :changes-only`
 
 ### Logs
 
