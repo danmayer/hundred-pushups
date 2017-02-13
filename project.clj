@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [
-                 [clj-time "0.12.2"]
+                 [clj-time "0.13.0"]
                  [com.andrewmcveigh/cljs-time "0.4.0"]
                  [core-async-storage "0.1.1"]
                  [day8.re-frame/async-flow-fx "0.0.6"]
