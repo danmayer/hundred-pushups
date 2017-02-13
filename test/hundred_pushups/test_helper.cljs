@@ -5,7 +5,8 @@
             [clojure.test :refer [assert-expr do-report]]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.random :refer [IRandom]]
-            [clojure.test.check.rose-tree :as rose]))
+            [clojure.test.check.rose-tree :as rose])
+  (:require-macros hundred-pushups.test-helper))
 
 (defn instrument-all [f]
   (st/instrument)
@@ -17,17 +18,6 @@
     (s/check-asserts true)
     (f)
     (s/check-asserts old-value)))
-
-#?(:clj
-   (defmethod assert-expr 'conforms-to? [msg form]
-     (let [args (rest form)]
-       `(let [result# (s/valid? ~@args)]
-          (if result#
-            (do-report {:type :pass :message ~msg
-                        :expected '~form :actual '~form})
-            (do-report {:type :fail :message ~msg
-                        :expected '~form :actual (s/explain-str ~@args)}))))))
-
 
 (defrecord NonRandom []
   IRandom

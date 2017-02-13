@@ -146,6 +146,10 @@
       :else
       :exr/do-test)))
 
+(comment
+  (suggested-day {:exr/circuits [], :exr/tests [{:exr/pushup-reps 0, :exr/plank-reps 0, :exr/ts #inst "1970-01-01T00:00:00.000-00:00"}]})
+  )
+
 (defn ui-state->path [ui-state]
   (concat
    (for [[k v]  (into [] (:pushup-reps-text ui-state))]
