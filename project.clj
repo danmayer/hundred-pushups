@@ -10,7 +10,7 @@
                  [day8.re-frame/async-flow-fx "0.0.6"]
                  [org.clojure/clojure "1.9.0-alpha14"]
                  [org.clojure/clojurescript "1.9.293"]
-                 [re-frame "0.8.0"]
+                 [re-frame "0.9.2"]
                  [reagent "0.6.0" :exclusions [cljsjs/react cljsjs/react-dom cljsjs/react-dom-server]]
                  ;; react-native-datepicker uses
                  ;; moment, and we need to convert to/from it
