@@ -19,11 +19,15 @@
   (is (= "19700101T000000Z" (inst->str (inst 0))))
   (is (= "19700112T134640Z" (inst->str (inst 1000000000)))))
 
-(deftest local-date-test
-  (testing "returns date based on timezone"
-    (is (= 2016
-           (first (local-date #inst "2016-01-02T01:01:01Z"))))
-    (is (= [2016 01 01]
-           (local-date #inst "2016-01-02T01:01:01Z" "America/Denver")))
-    (is (= [2016 01 02]
-           (local-date #inst "2016-01-02T12:01:01Z" "America/Denver")))))
+;; FIXME - you can't set time zones in CLJS
+;; https://github.com/andrewmcveigh/cljs-time/issues/14
+;; so I'm not sure how to test this without breaking CI
+#?(:clj
+   (deftest local-date-test
+     (testing "returns date based on timezone"
+       (is (= 2016
+              (first (local-date #inst "2016-01-02T01:01:01Z"))))
+       (is (= [2016 01 01]
+              (local-date #inst "2016-01-02T01:01:01Z" "America/Denver")))
+       (is (= [2016 01 02]
+              (local-date #inst "2016-01-02T12:01:01Z" "America/Denver"))))))
