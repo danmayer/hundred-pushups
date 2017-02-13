@@ -6,7 +6,7 @@
   :dependencies [
                  [clj-time "0.13.0"]
                  [com.andrewmcveigh/cljs-time "0.4.0"]
-                 [core-async-storage "0.1.1"]
+                 [core-async-storage "0.2.0"]
                  [day8.re-frame/async-flow-fx "0.0.6"]
                  [org.clojure/clojure "1.9.0-alpha14"]
                  [org.clojure/clojurescript "1.9.293"]
