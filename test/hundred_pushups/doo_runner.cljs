@@ -1,4 +1,4 @@
-(ns hundred-pushups.node-runner
+(ns hundred-pushups.doo-runner
   (:require [doo.runner :refer-macros [doo-tests]]
             [hundred-pushups.datetime-test]
             [hundred-pushups.db-test]
