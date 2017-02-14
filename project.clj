@@ -4,13 +4,13 @@
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [
-                 [clj-time "0.12.2"]
+                 [clj-time "0.13.0"]
                  [com.andrewmcveigh/cljs-time "0.4.0"]
-                 [core-async-storage "0.1.1"]
+                 [core-async-storage "0.2.0"]
                  [day8.re-frame/async-flow-fx "0.0.6"]
                  [org.clojure/clojure "1.9.0-alpha14"]
                  [org.clojure/clojurescript "1.9.293"]
-                 [re-frame "0.8.0"]
+                 [re-frame "0.9.2"]
                  [reagent "0.6.0" :exclusions [cljsjs/react cljsjs/react-dom cljsjs/react-dom-server]]
                  ;; react-native-datepicker uses
                  ;; moment, and we need to convert to/from it
@@ -23,9 +23,9 @@
              ["with-profile" "prod" "cljsbuild" "once" ]]}
   :profiles {:project-tools {:plugins [[com.jakemccrary/lein-test-refresh "0.18.0"]
                                        [venantius/ultra "0.5.0"]]
-                             :dependencies [[proto-repl-charts "0.3.1"]
+                             :dependencies [[proto-repl-charts "0.3.2"]
                                             [proto-repl "0.3.1"]]}
-             :dev {:dependencies [[figwheel-sidecar "0.5.8"]
+             :dev {:dependencies [[figwheel-sidecar "0.5.9"]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [org.clojure/test.check "0.9.0"]
                                   [com.gfredericks/test.chuck "0.2.7"]]
