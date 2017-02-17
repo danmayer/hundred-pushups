@@ -180,7 +180,7 @@
   (time/today-at (time/hour (time.format/parse day-of-formatter time-string)) 00))
 
 (defn day-symbol [day-num]
-  (keyword  (["monday" "tuesday" "wednesday" "thursday" "friday" "saturday" "sunday"] (- day-num 1))))
+  (keyword  (["monday" "tuesday" "wednesday" "thursday" "friday" "saturday" "sunday"] (dec day-num))))
 
 (defn todays-range [whitelist blacklist]
   (map
@@ -189,7 +189,7 @@
   )
 
 (defn next-workout-time [options]
-  (let [now-time (get options :current-time time/today)]
+  (let [now-time (get options :current-time (time/today))]
     (if (> (get-in options [:num-sets]) 0)
       (do
         (if (time/within? (time/interval (first (get-in options [:available-ranges]))(last (get-in options [:available-ranges])))
