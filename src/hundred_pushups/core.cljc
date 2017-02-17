@@ -1,64 +1,45 @@
 (ns hundred-pushups.core
   (:require
-    [clojure.spec.test :as st]
     [clojure.spec :as s]
-
-    #?@(:clj  [[clj-time.coerce :as time.coerce]
-               [clj-time.core :as time]
-               [clj-time.format  :as time.format]]
-        :cljs [[cljs-time.coerce :as time.coerce]
-               [cljs-time.core :as time]
-               [cljs-time.format :as time.format]])))
+    [hundred-pushups.datetime :as dt]))
 
 ;;;;;; specs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(s/def :exr/zero-or-pos-int (s/and int?
-                                   #(<= 0 %)))
-(s/def :exr/reps :exr/zero-or-pos-int)
+(s/def :exr/s-pos-int (s/and int? #(<= 0 %))) ; strictly positive int
+(s/def :exr/reps :exr/s-pos-int)
 (s/def :exr/pushup-reps :exr/reps)
 (s/def :exr/plank-reps :exr/reps)
 (s/def :exr/sets (s/int-in 4 20))
 (s/def :exr/ts inst?)
 
-(s/def :exr/completed-circuit
+(s/def :exr/circuit
   (s/keys :req [:exr/pushup-reps :exr/plank-reps :exr/ts]))
 (s/def :exr/suggested-circuit
   (s/keys :req [:exr/pushup-reps :exr/plank-reps]))
-(s/def :exr/completed-test
+(s/def :exr/test
   (s/keys :req [:exr/pushup-reps :exr/plank-reps :exr/ts]))
 
-(s/def :exr/completed-circuits (s/keys :req [:exr/sets :exr/completed-circuits]))
 (s/def :exr/suggested-circuits (s/keys :req [:exr/sets :exr/suggested-circuit]))
 
-(s/def :exr/day
+(s/def :exr/action
   (s/or
    :do-circuits :exr/suggested-circuits
    :do-test #{:exr/do-test}))
 
-(s/def :exr/completed-circuit-log (s/coll-of :exr/completed-circuit))
-(s/def :exr/completed-test-log (s/coll-of :exr/completed-test))
+(s/def :exr/circuits (s/coll-of :exr/circuit))
+(s/def :exr/tests (s/coll-of :exr/test))
+(s/def :exr/history (s/and (s/keys :req [:exr/circuits
+                                         :exr/tests])
+                           #(pos?
+                              (count (:exr/tests %)))))
 
 ;;;;;; private ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def dummy-ts (dt/inst 0))
 
 (defn parse-int [x]
   #?(:clj  (Integer/parseInt x)
      :cljs (js/parseInt x)))
-
-(defn now []
-  (time.coerce/to-date (time/now)))
-
-(defn ts [second-since-epoch]
-  (time.coerce/to-date second-since-epoch))
-
-(def dummy-ts (ts 0))
-
-(defn local-date [inst]
-  (let [dt (time.coerce/from-date inst)
-        local-dt #?(:cljs (time/to-default-time-zone dt)
-                    :clj (time/to-time-zone (time.coerce/to-date-time dt) (time/default-time-zone)))]
-    [(time/year local-dt)
-     (time/month local-dt)
-     (time/day local-dt)]))
 
 (defn div-ceil [num den]
   (let [q (quot num den)
@@ -77,11 +58,11 @@
         (for [[k v] m]
           [k (f v)])))
 
-(defn last-days-log [circuit-log]
-  (vec (last (partition-by (comp local-date :exr/ts) circuit-log))))
+(defn last-days-log [circuits]
+  (vec (last (partition-by (comp dt/local-date :exr/ts) circuits))))
 
 (s/fdef day->log
-        :args (s/cat :day :exr/day
+        :args (s/cat :day :exr/action
                      :ts :exr/ts))
 (defn day->log [day ts]
   (if (= day :exr/do-test)
@@ -90,9 +71,9 @@
             (assoc (:exr/suggested-circuit day)
                    :exr/ts ts))))
 
-(defn but-last-day [circuit-log]
-  (->> circuit-log
-       (partition-by (comp local-date :exr/ts) )
+(defn but-last-day [circuits]
+  (->> circuits
+       (partition-by (comp dt/local-date :exr/ts) )
        butlast
        flatten
        vec))
@@ -113,37 +94,52 @@
   ;; <= works for instants in CLJS, but not CLJ
   (neg? (compare ts1 ts2)))
 
-(defn dbg [l x ]
-  (prn l x)
-  x)
+(declare suggested-day)
+
+(defn analyze-history [history]
+  "Given a history, adds key/value pairs
+   regarding the state of the history"
+  (let [{:keys [:exr/circuits
+                :exr/tests]} history
+        last-circuit (last circuits)
+        last-test (last tests)
+        defaults {:fresh-test? false
+                  :last-workout-completed? false}]
+
+    (cond-> (merge history defaults)
+      (and (nil? last-circuit) last-test)
+      (assoc :fresh-test? true
+             :last-workout-completed? false)
+
+      (ts-greater? (:exr/ts last-circuit (dt/inst 0)) (:exr/ts last-test))
+      (assoc :fresh-test? true)
+
+      (and last-circuit
+           (completed-circuit?
+            (suggested-day {:exr/tests tests :exr/circuits (but-last-day circuits)})
+            circuits))
+      (assoc :last-workout-completed? true))))
 
 ;;;;;; public ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (s/fdef suggested-day
         :args (s/cat
-               :completed-test-log (s/and :exr/completed-test-log
-                                          (fn [x] (pos? (count x))))
-               :circuit-log :exr/completed-circuit-log)
-        :ret :exr/day)
-(defn suggested-day [completed-test-log circuit-log]
-  (let [reps [:exr/pushup-reps :exr/plank-reps]
-        last-circuit (last circuit-log) #_(select-keys (last circuit-log) reps)
-        last-test (last completed-test-log) #_(select-keys (last completed-test-log) reps)]
+               :history :exr/history)
+        :ret :exr/action)
+(defn suggested-day [history]
+  (let [{:keys [:exr/circuits
+                :exr/tests
+                :last-workout-completed?
+                :fresh-test?]} (analyze-history history)
+        last-circuit (last circuits)
+        last-test (last tests)]
+
     (cond
-      (nil? last-test)
-      :exr/do-test
-
-      (nil? last-circuit)
+      fresh-test?
       {:exr/sets 4
        :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
 
-      (ts-greater? (:exr/ts last-circuit (ts 0)) (:exr/ts last-test))
-      {:exr/sets 4
-       :exr/suggested-circuit (map-vals half (dissoc last-test :exr/ts))}
-
-      (completed-circuit?
-       (suggested-day completed-test-log (but-last-day circuit-log))
-       circuit-log)
+      last-workout-completed?
       {:exr/sets 4
        :exr/suggested-circuit (map-vals inc (dissoc last-circuit :exr/ts))}
 
@@ -174,32 +170,23 @@
   (and (some? input)
   (some? (re-matches #"\d+(am|pm)" input))))
 
-(def day-of-formatter (time.format/formatter "ha"))
-
-(defn parse-time [time-string]
-  (time/today-at (time/hour (time.format/parse day-of-formatter time-string)) 00))
-
-(defn day-symbol [day-num]
-  (keyword  (["monday" "tuesday" "wednesday" "thursday" "friday" "saturday" "sunday"] (dec day-num))))
-
 (defn todays-range [whitelist blacklist]
   (map
-    parse-time
-    (get-in whitelist [(day-symbol (time/day-of-week (time/today)))]))
+    dt/parse-time
+    (get-in whitelist [(dt/day-week-symbol)]))
   )
 
 (defn next-workout-time [options]
-  (let [now-time (get options :current-time (time/today))]
+  (let [now-time (get options :current-time (dt/today))]
     (if (> (get-in options [:num-sets]) 0)
       (do
-        (if (time/within? (time/interval (first (get-in options [:available-ranges]))(last (get-in options [:available-ranges])))
-              now-time)
+        (if (dt/in-time-interval? now-time (first (get-in options [:available-ranges])) (last (get-in options [:available-ranges])))
           now-time
           (do
-            (if (time/before? now-time (first (get-in options [:available-ranges])))
+            (if (dt/before? now-time (first (get-in options [:available-ranges])))
               (first (get-in options [:available-ranges]))
               (do
-                (if (time/before? now-time (last (get-in options [:available-ranges])))
+                (if (dt/before? now-time (last (get-in options [:available-ranges])))
                   (last (get-in options [:available-ranges]))
                   nil
                   )))

@@ -10,6 +10,7 @@
     "babel-plugin-transform-es2015-block-scoping": "6.15.0",
     "react": "15.3.2",
     "react-native": "0.37.0",
+    "react-native-datepicker": "^1.4.3",
     "react-native-scrollable-tab-view": "^0.7.0",
     "whatwg-fetch": "^2.0.1"
   },

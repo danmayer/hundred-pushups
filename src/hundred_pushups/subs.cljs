@@ -3,12 +3,6 @@
             [hundred-pushups.core :as core]
             [hundred-pushups.db :as db]))
 
-;; FIXME - delete after android no longer uses this
-(reg-sub
-  :get-greeting
-  (fn [db _]
-    (:greeting db)))
-
 (reg-sub
  :stage
  (fn [db _]
@@ -38,10 +32,23 @@
 (reg-sub
  :days-exercise
  (fn [db _]
-   (core/suggested-day (:completed-test-log db)
-                       (:completed-circuit-log db))))
+   (core/suggested-day
+     {:exr/circuits
+      (:circuits db)
+      :exr/tests
+      (:tests db)})))
 
 (reg-sub
  :selected-tab
  (fn [db _]
    (get hundred-pushups.db/tabs (:selected-tab db))))
+
+(reg-sub
+ :actual-time
+ (fn [db _]
+   (:actual-time db)))
+
+(reg-sub
+ :simulated-time
+ (fn [db _]
+   (:simulated-time db)))
