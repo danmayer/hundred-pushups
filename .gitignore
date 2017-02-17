@@ -2,6 +2,7 @@
 #
 .DS_Store
 .lein-repl-history
+.lein-failures
 
 # Xcode
 #
