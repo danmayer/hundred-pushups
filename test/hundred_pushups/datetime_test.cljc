@@ -1,7 +1,9 @@
 (ns hundred-pushups.datetime-test
   (:require [clojure.test :refer [testing deftest is]]
             [clojure.spec :as s]
-            [clj-time.core :as time]
+            #?@(:clj  [[clj-time.core :as time]
+                       ]
+                :cljs [[cljs-time.core :as time]])
             [hundred-pushups.datetime :refer [inst ct-fmt->moment-fmt now inst->str local-date parse-time]]
             [com.gfredericks.test.chuck.clojure-test :refer [checking]]))
 
@@ -22,10 +24,10 @@
 
 
 (deftest parse-time-test
-  (is (= (time/today-at 0 00), (parse-time "12am")))
-  (is (= (time/today-at 9 00), (parse-time "9am")))
-  (is (= (time/today-at 15 00), (parse-time  "3pm")))
-  (is (= (time/today-at 23 00), (parse-time  "11pm"))))
+  (is (= (inst (time/today-at 0 00)), (inst (parse-time "12am"))))
+  (is (= (inst (time/today-at 9 00)), (inst (parse-time "9am"))))
+  (is (= (inst (time/today-at 15 00)), (inst (parse-time  "3pm"))))
+  (is (= (inst (time/today-at 23 00)), (inst (parse-time  "11pm")))))
 
 ;; FIXME - you can't set time zones in CLJS
 ;; https://github.com/andrewmcveigh/cljs-time/issues/14

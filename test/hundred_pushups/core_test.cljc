@@ -2,7 +2,9 @@
   (:require [clojure.test :refer [testing use-fixtures is deftest]]
             [clojure.spec :as s]
             [clojure.test.check.generators :as gen]
-            [clj-time.core :as time]
+            #?@(:clj  [[clj-time.core :as time]
+                       ]
+                :cljs [[cljs-time.core :as time]])
             [hundred-pushups.test-helper :refer [instrument-all check-asserts] :include-macros true]
             [hundred-pushups.core :refer [day->log suggested-day analyze-history dummy-ts last-days-log completed-circuit? parse-int merge-day-changes format-whitelist-row valid-hour-time todays-range next-workout-time]]
             [hundred-pushups.datetime :as dt]
