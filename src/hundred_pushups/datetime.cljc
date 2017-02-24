@@ -31,6 +31,10 @@
   [second-since-epoch]
   (time.coerce/to-date second-since-epoch))
 
+(comment
+  (dt/inst (time/today-at 0 00))
+  )
+
 (defn ct-fmt->moment-fmt
   "Converts a cljs-time format string to a moment.js format str
    See http://momentjs.com/docs/#/parsing/string-format/ for details."
@@ -104,5 +108,3 @@
      [(time/year local-dt)
       (time/month local-dt)
       (time/day local-dt)])))
-
-
